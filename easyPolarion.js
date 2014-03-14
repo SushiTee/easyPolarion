@@ -1,8 +1,10 @@
 // ==UserScript==
 // @name       easyPolarion
 // @namespace  https://polarion.server
-// @version    0.1.2
+// @version    0.1.3
 // @description  Script to make the life with Polarion easier
+// @include    /^https?://polarion\.server.*/polarion/.*
+// @noframes
 // @require    http://code.jquery.com/jquery-latest.js
 // @updateURL  https://raw.github.com/SushiTee/easyPolarion/master/easyPolarion.js
 // @downloadURL  https://raw.github.com/SushiTee/easyPolarion/master/easyPolarion.js
