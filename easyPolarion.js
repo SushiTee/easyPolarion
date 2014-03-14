@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       easyPolarion
 // @namespace  https://polarion.server
-// @version    0.1.3
+// @version    0.1.4
 // @description  Script to make the life with Polarion easier
 // @include    /^https?://polarion\.server.*/polarion/.*
 // @noframes
@@ -19,6 +19,20 @@ var LastWorkItemID = '';
 var testTimeArray = [];
 var searchLineText = '';
 var messageActive = false;
+var menuImage = 'iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAATbSURBVEhLnVZp'
+                + 'SGVlGLaIaWomyJiiEJKiX0VENUQwTM2PgqE0Cfd9H1fcNfd96bqTy83UKS2vSwajMiriknKVUUljwhm9EKLmAuJ2cct77/l6nsNcu26MJXycc+75vud53vd93vdoZnaOv'
+                + '7i4uLCgoKDf3dzcHrq4uDz08fHxOsexk1va29ufLS4ufi8vL8/c9G10dPS34eHhwsvLS3h7e4vq6ur7W1tb7sY9eH6hrKzsbaVSaXEmcVpa2huRkZHRYWFhP8XGxqYWFR'
+                + 'XdzMrKugFwb39/fzWBHRwcBCIQVVVVoq2tbRxXW4VCcR3kUaGhoT9ERER8zWecfeYIUUtLy4WoqKhwAGk9PT0F0rGblJT0B8CHcb+C1EgEt7e3l0lIBrD9hISEaYgZ8PX'
+                + '1nXd3dxe47hYWFv7S399/TQjx1CFJQ0PDleDgYAVTQAIu3uOQngednZ2Fo6OjfDXeMxLu8fDw0Lm6ugonJycKE+Xl5dqJiQkFCF4/JKivr7+UmJjoFRISMgtwiZu5qNbO'
+                + 'zo7KBCISubm5IjMzUyCNMpGtra28j4vPSLMYHByUNjY2hiRJsjmSptra2ncyMjJaoHifmwkOdSI5OdnQ3Nws1Gq1fnx8fA3hzzc1Na3k5ORISJNcExIxbRUVFWJ9fX3RY'
+                + 'DB8D4JrRwjgnrdiYmIaEe4O00Hw7OxsaWxsbA+OWUTIv+JgFVbm3t6eYmhoqK2goGAOwAaKYVpRXGlhYeEBwL884SYUyz4wMHAOigwsJlJmAMjfWq32L4B+B4JPcPAVXK'
+                + '/g+tLS0pIlaucHUfMwhxxxfHy86Ovrm1tZWfnikABhxsNit6FEzYIai4e6iM3NTYZ7G4DXAfzkcVUdHR0WyLsKwrQkQAOK1NTUXfzWC1cq0aABZiighkWjI7iJ6WFTdXd'
+                + '3G/R6vRrgnwP8wmkNhBRdSk9PDwDGNJ3E2lEgI0JPCQi/Z4Yf58hMYBLQEWAWPT09O1DfAILXzurOgYGBi/duviqMiwRML50XEBAgYH0NI7iPGzkCkpCA7BgbmyBQMt9n'
+                + 'EaBBLx8nIAkNkpKSQltrzABug7YfUKlUAn0gE9BysO0+CqkCwYtnESDXz5sSsIcAqoe4g5mZGTE1NfVAPgsQq+Hh4Xa0/iIUyLZj00DhbxqN5uPTCKgeznM1JYCLpJGRk'
+                + 'R2dTjeN6O8CN+7wbE1NzVU44A4bjany8/NjLbbwe3Vra+tHGAEvV1ZWmpsCPu7+iDCofxOAKgy2HTqBqaJtYcEtvBvDiFDCMV89DtT0van652DVWyj4nwDVEZxO4AKhbD'
+                + 'u4YhPvZ/8XATrSHEqLOdSonk54BCpHYewPvuOiFY17jhWZ82hvcnIyF/m3PIygs7PzaXR0IMbtEp2EDw2/WhKWHvPIQE8T0Dg5aWnUi+8lUwJas6urS1pbW+sHwb/jAp3'
+                + '6BLrSsrS0NBGHZkdHRwU2La2urk5AzXh+fv4ai86pSfW0IvbscI8pQW9vr255eVmLCfAzMG+ccB+8awFA/+3t7SbYrBwqPsP6FJP2LseJlZWVsLa2Fo2NjfqDg4MZ7PnG'
+				+ 'lADfgR8fzS47DsVT+4dzB6AfYL1r3ICJaYO09ZaUlGzX1dUJTEsBIKbhQ+MenLuI56u4vo91+T//10FSfkgQ/igbCSv7PED/AExELp7pn1dSAAAAAElFTkSuQmCC';
 
 function addGlobalStyle(css) {
     var head = $('head');
@@ -31,11 +45,11 @@ function removeGlobalStyle() {
 }
 
 function waitForFnc(){
-    var done = $('.polarion-BubblePanel-InputField');
+    var done = $('.polarion-NavigationPanelSettingsShortcuts');
     if(done.length <= 0){
         window.setTimeout(waitForFnc,200);
     }
-    else{
+    else {
         runScript();
     }
 }
@@ -123,6 +137,47 @@ function getNextItem(curItem) {
     }
 
     return firstItem;
+}
+
+function addMarkMenu() {
+    if($('#ItemMarkMenu').length) {
+        return;
+    }
+
+    var searchField = $('.polarion-BubblePanel-InputField');
+    if(!searchField.length) {
+        return;
+    }
+
+	// update search text    
+    updateSearchLineText();
+	
+    searchField = $(searchField).closest('.GGAJDYPHKB-com-polarion-portal-js-viewers-querypanel-AbstractQueryPanel-CSS-CellFree').parent().closest('td');
+    if(!searchField.length) {
+        return;
+    }
+
+    $(searchField).next().next().after('<td id="ItemMarkMenu" data-menu="off" class="GGAJDYPGKB-com-polarion-portal-js-viewers-querypanel-AbstractQueryPanel-CSS-Cell">'
+                                           + '<div id="ItemMarkPopup">'
+                                               + '<table>'
+                                                    + '<tr><td><div class="ItemMarkEl" data-id="0">Default</div></td></tr>'
+                                                    + '<tr><td><div class="ItemMarkEl" data-id="1"></div></td></tr>'
+                                                    + '<tr><td><div class="ItemMarkEl" data-id="2"></div></td></tr>'
+                                                    + '<tr><td><div class="ItemMarkEl" data-id="3"></div></td></tr>'
+                                                    + '<tr><td><div class="ItemMarkEl" data-id="4"></div></td></tr>'
+                                                + '</table>'
+                                            + '</div>'
+                                            + '<table id="ItemMarkMenuButton" cellspacing="0" cellpadding="0" class="GGAJDYPB1B-com-polarion-reina-web-js-widgets-toolbar-ToolbarPopupButton-CSS2-Button">'
+                                                + '<tr>'
+                                                    + '<td class="GGAJDYPASB-com-polarion-reina-web-js-widgets-JSPopupButton-CSS-IconCellStyle GGAJDYPBSB-com-polarion-reina-web-js-widgets-JSPopupButton-CSS-IconCellStyleWithoutText" valign="middle" title="Show Sidebar">'
+                                                        + '<img class="GGAJDYPP-B-com-polarion-reina-web-js-widgets-toolbar-ToolbarButton-CSS2-Icon" src="data:image/png;base64,' + menuImage + '">'
+                                                    + '</td>'
+                                                    + '<td class="GGAJDYPG1B-com-polarion-reina-web-js-widgets-toolbar-ToolbarPopupButton-CSS2-IconTD" valign="middle">'
+                                                       + '<img class="GGAJDYPP0B-com-polarion-reina-web-js-widgets-toolbar-ToolbarPopupButton-CSS2-Arrow" src="/polarion/ria/images/button_arrow.gif">'
+                                                    + '</td>'
+                                                + '</tr>'
+                                            + '</table>'
+                                       + '</td>');
 }
 
 $(document).ready(function() {
@@ -236,28 +291,14 @@ $(document).ready(function() {
 function mainLoop() {
     TestRunCheck();
     autoClick();
+    addMarkMenu();
 }
 
 function runScript() {
-    // search line text
-    updateSearchLineText();
+    // start the main loop
     startMainLoop();
 
     // css stuff
-    var menuImage = 'iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAATbSURBVEhLnVZp'
-					+ 'SGVlGLaIaWomyJiiEJKiX0VENUQwTM2PgqE0Cfd9H1fcNfd96bqTy83UKS2vSwajMiriknKVUUljwhm9EKLmAuJ2cct77/l6nsNcu26MJXycc+75vud53vd93vdoZnaOv'
-					+ '7i4uLCgoKDf3dzcHrq4uDz08fHxOsexk1va29ufLS4ufi8vL8/c9G10dPS34eHhwsvLS3h7e4vq6ur7W1tb7sY9eH6hrKzsbaVSaXEmcVpa2huRkZHRYWFhP8XGxqYWFR'
-					+ 'XdzMrKugFwb39/fzWBHRwcBCIQVVVVoq2tbRxXW4VCcR3kUaGhoT9ERER8zWecfeYIUUtLy4WoqKhwAGk9PT0F0rGblJT0B8CHcb+C1EgEt7e3l0lIBrD9hISEaYgZ8PX'
-					+ '1nXd3dxe47hYWFv7S399/TQjx1CFJQ0PDleDgYAVTQAIu3uOQngednZ2Fo6OjfDXeMxLu8fDw0Lm6ugonJycKE+Xl5dqJiQkFCF4/JKivr7+UmJjoFRISMgtwiZu5qNbO'
-					+ 'zo7KBCISubm5IjMzUyCNMpGtra28j4vPSLMYHByUNjY2hiRJsjmSptra2ncyMjJaoHifmwkOdSI5OdnQ3Nws1Gq1fnx8fA3hzzc1Na3k5ORISJNcExIxbRUVFWJ9fX3RY'
-					+ 'DB8D4JrRwjgnrdiYmIaEe4O00Hw7OxsaWxsbA+OWUTIv+JgFVbm3t6eYmhoqK2goGAOwAaKYVpRXGlhYeEBwL884SYUyz4wMHAOigwsJlJmAMjfWq32L4B+B4JPcPAVXK'
-					+ '/g+tLS0pIlaucHUfMwhxxxfHy86Ovrm1tZWfnikABhxsNit6FEzYIai4e6iM3NTYZ7G4DXAfzkcVUdHR0WyLsKwrQkQAOK1NTUXfzWC1cq0aABZiighkWjI7iJ6WFTdXd'
-					+ '3G/R6vRrgnwP8wmkNhBRdSk9PDwDGNJ3E2lEgI0JPCQi/Z4Yf58hMYBLQEWAWPT09O1DfAILXzurOgYGBi/duviqMiwRML50XEBAgYH0NI7iPGzkCkpCA7BgbmyBQMt9n'
-					+ 'EaBBLx8nIAkNkpKSQltrzABug7YfUKlUAn0gE9BysO0+CqkCwYtnESDXz5sSsIcAqoe4g5mZGTE1NfVAPgsQq+Hh4Xa0/iIUyLZj00DhbxqN5uPTCKgeznM1JYCLpJGRk'
-					+ 'R2dTjeN6O8CN+7wbE1NzVU44A4bjany8/NjLbbwe3Vra+tHGAEvV1ZWmpsCPu7+iDCofxOAKgy2HTqBqaJtYcEtvBvDiFDCMV89DtT0van652DVWyj4nwDVEZxO4AKhbD'
-					+ 'u4YhPvZ/8XATrSHEqLOdSonk54BCpHYewPvuOiFY17jhWZ82hvcnIyF/m3PIygs7PzaXR0IMbtEp2EDw2/WhKWHvPIQE8T0Dg5aWnUi+8lUwJas6urS1pbW+sHwb/jAp3'
-					+ '6BLrSsrS0NBGHZkdHRwU2La2urk5AzXh+fv4ai86pSfW0IvbscI8pQW9vr255eVmLCfAzMG+ccB+8awFA/+3t7SbYrBwqPsP6FJP2LseJlZWVsLa2Fo2NjfqDg4MZ7PnG'
-					+ 'lADfgR8fzS47DsVT+4dzB6AfYL1r3ICJaYO09ZaUlGzX1dUJTEsBIKbhQ+MenLuI56u4vo91+T//10FSfkgQ/igbCSv7PED/AExELp7pn1dSAAAAAElFTkSuQmCC';
     var head = $('head');
     var css = '#ExtraTestMenuButton {background-size:18px;width:18px;height:18px;margin:7px;opacity:0.5;} #ExtraTestMenuButton:hover {opacity:1.0;} ';
     css += '#ExtraTestMenuButton {background-image: url(data:image/png;base64,' + menuImage + ')} ';
@@ -302,33 +343,6 @@ function runScript() {
     
     var menu = $('#ExtraTestMenu');
     $(menu).html(menuHtml);
-    
-    var searchField = $('.polarion-BubblePanel-InputField').closest('.GGAJDYPHKB-com-polarion-portal-js-viewers-querypanel-AbstractQueryPanel-CSS-CellFree').parent().closest('td');
-    if(!searchField.length) {
-        return;
-    }
-    
-    $(searchField).next().next().after('<td id="ItemMarkMenu" data-menu="off" class="GGAJDYPGKB-com-polarion-portal-js-viewers-querypanel-AbstractQueryPanel-CSS-Cell">'
-                                           + '<div id="ItemMarkPopup">'
-                                               + '<table>'
-                                                    + '<tr><td><div class="ItemMarkEl" data-id="0">Default</div></td></tr>'
-                                                    + '<tr><td><div class="ItemMarkEl" data-id="1"></div></td></tr>'
-                                                    + '<tr><td><div class="ItemMarkEl" data-id="2"></div></td></tr>'
-                                                    + '<tr><td><div class="ItemMarkEl" data-id="3"></div></td></tr>'
-                                                    + '<tr><td><div class="ItemMarkEl" data-id="4"></div></td></tr>'
-                                                + '</table>'
-                                            + '</div>'
-                                            + '<table id="ItemMarkMenuButton" cellspacing="0" cellpadding="0" class="GGAJDYPB1B-com-polarion-reina-web-js-widgets-toolbar-ToolbarPopupButton-CSS2-Button">'
-                                                + '<tr>'
-                                                    + '<td class="GGAJDYPASB-com-polarion-reina-web-js-widgets-JSPopupButton-CSS-IconCellStyle GGAJDYPBSB-com-polarion-reina-web-js-widgets-JSPopupButton-CSS-IconCellStyleWithoutText" valign="middle" title="Show Sidebar">'
-                                                        + '<img class="GGAJDYPP-B-com-polarion-reina-web-js-widgets-toolbar-ToolbarButton-CSS2-Icon" src="data:image/png;base64,' + menuImage + '">'
-                                                    + '</td>'
-                                                    + '<td class="GGAJDYPG1B-com-polarion-reina-web-js-widgets-toolbar-ToolbarPopupButton-CSS2-IconTD" valign="middle">'
-                                                       + '<img class="GGAJDYPP0B-com-polarion-reina-web-js-widgets-toolbar-ToolbarPopupButton-CSS2-Arrow" src="/polarion/ria/images/button_arrow.gif">'
-                                                    + '</td>'
-                                                + '</tr>'
-                                            + '</table>'
-                                       + '</td>');
 }
 
 function autoClick() {
