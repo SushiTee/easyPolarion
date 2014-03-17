@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       easyPolarion
 // @namespace  https://polarion.server
-// @version    0.1.4
+// @version    0.1.5
 // @description  Script to make the life with Polarion easier
 // @include    /^https?://polarion\.server.*/polarion/.*
 // @noframes
@@ -160,11 +160,11 @@ function addMarkMenu() {
     $(searchField).next().next().after('<td id="ItemMarkMenu" data-menu="off" class="GGAJDYPGKB-com-polarion-portal-js-viewers-querypanel-AbstractQueryPanel-CSS-Cell">'
                                            + '<div id="ItemMarkPopup">'
                                                + '<table>'
-                                                    + '<tr><td><div class="ItemMarkEl" data-id="0">Default</div></td></tr>'
-                                                    + '<tr><td><div class="ItemMarkEl" data-id="1"></div></td></tr>'
-                                                    + '<tr><td><div class="ItemMarkEl" data-id="2"></div></td></tr>'
-                                                    + '<tr><td><div class="ItemMarkEl" data-id="3"></div></td></tr>'
-                                                    + '<tr><td><div class="ItemMarkEl" data-id="4"></div></td></tr>'
+                                                    + '<tr><td><div class="ItemMarkEl" data-state="none">Default</div></td></tr>'
+                                                    + '<tr><td><div class="ItemMarkEl" data-state="passed"></div></td></tr>'
+                                                    + '<tr><td><div class="ItemMarkEl" data-state="failed"></div></td></tr>'
+                                                    + '<tr><td><div class="ItemMarkEl" data-state="notRelevant"></div></td></tr>'
+                                                    + '<tr><td><div class="ItemMarkEl" data-state="notTested"></div></td></tr>'
                                                 + '</table>'
                                             + '</div>'
                                             + '<table id="ItemMarkMenuButton" cellspacing="0" cellpadding="0" class="GGAJDYPB1B-com-polarion-reina-web-js-widgets-toolbar-ToolbarPopupButton-CSS2-Button">'
@@ -274,12 +274,7 @@ $(document).ready(function() {
             return;
         }
         
-        if($(this).attr('data-id') == '0') {
-            $(selectedItem).css('background-color', '');
-        }
-        else {
-        	$(selectedItem).css('background-color', $(this).css('background-color'));
-        }
+        $(selectedItem).attr('data-state', $(this).attr('data-state'));
     });
     
     $(document).on("click", "#testAvTime", function() {
@@ -307,14 +302,10 @@ function runScript() {
     css += '#ItemMarkPopup {display: none; position: absolute; width: 100px; top: 40px; left: 10px; border: 1px solid black; background-color: #F7F7F7; z-index: 5;} ';
     css += '.ItemMarkEl {display: inline-block; height: 20px; width: 90px; margin: 2px;} ';
     css += '.ItemMarkEl:hover {cursor: pointer;} ';
-    css += '.ItemMarkEl[data-id="1"] {background-color: #B3EBA2;} ';
-    css += '.ItemMarkEl[data-id="2"] {background-color: #C94F4F;} ';
-    css += '.ItemMarkEl[data-id="3"] {background-color: #AB61DD;} ';
-    css += '.ItemMarkEl[data-id="4"] {background-color: #D7DD46;} ';
-    css += '.JSTreeTableRow[data-state="passed"] {background-color: #B3EBA2;} .JSTreeTableRow[data-state="passed"]:hover {background-color: #A6D896;} ';
-    css += '.JSTreeTableRow[data-state="failed"] {background-color: #C94F4F;} .JSTreeTableRow[data-state="failed"]:hover {background-color: #A73838;} ';
-    css += '.JSTreeTableRow[data-state="notRelevant"] {background-color: #AB61DD;} .JSTreeTableRow[data-state="notRelevant"]:hover {background-color: #894BB3;} ';
-    css += '.JSTreeTableRow[data-state="notTested"] {background-color: #D7DD46;} .JSTreeTableRow[data-state="notTested"]:hover {background-color: #C3C947;} ';
+    css += '.JSTreeTableRow[data-state="passed"], .ItemMarkEl[data-state="passed"] {background-color: #B3EBA2;} .JSTreeTableRow[data-state="passed"]:hover, .ItemMarkEl[data-state="passed"]:hover {background-color: #A6D896;} ';
+    css += '.JSTreeTableRow[data-state="failed"], .ItemMarkEl[data-state="failed"] {background-color: #C94F4F;} .JSTreeTableRow[data-state="failed"]:hover, .ItemMarkEl[data-state="failed"]:hover {background-color: #A73838;} ';
+    css += '.JSTreeTableRow[data-state="notRelevant"], .ItemMarkEl[data-state="notRelevant"] {background-color: #AB61DD;} .JSTreeTableRow[data-state="notRelevant"]:hover, .ItemMarkEl[data-state="notRelevant"]:hover {background-color: #894BB3;} ';
+    css += '.JSTreeTableRow[data-state="notTested"], .ItemMarkEl[data-state="notTested"] {background-color: #D7DD46;} .JSTreeTableRow[data-state="notTested"]:hover, .ItemMarkEl[data-state="notTested"]:hover {background-color: #C3C947;} ';
     css += '#testAvTime {margin-left: 5px;} ';
     css += '#testAvTime:hover {cursor: pointer;} ';
     css += '#ItemMarkMenu {position:relative;}';
