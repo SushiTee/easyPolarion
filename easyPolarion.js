@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       easyPolarion
 // @namespace  https://polarion.server
-// @version    0.1.5
+// @version    0.1.6
 // @description  Script to make the life with Polarion easier
 // @include    /^https?://polarion\.server.*/polarion/.*
 // @noframes
@@ -18,6 +18,7 @@ var LastTestID = '';
 var LastWorkItemID = '';
 var testTimeArray = [];
 var searchLineText = '';
+var testCounter = {passed: 0, failed: 0, notRelevant: 0, notTested: 0};
 var messageActive = false;
 var menuImage = 'iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAATbSURBVEhLnVZp'
                 + 'SGVlGLaIaWomyJiiEJKiX0VENUQwTM2PgqE0Cfd9H1fcNfd96bqTy83UKS2vSwajMiriknKVUUljwhm9EKLmAuJ2cct77/l6nsNcu26MJXycc+75vud53vd93vdoZnaOv'
@@ -210,17 +211,35 @@ $(document).ready(function() {
 
         if(buttonText == 'Passed') {
             $(selectedItem).attr('data-state', 'passed');
+            
+            testCounter.passed++;
+            
+            $('#testPassed td:nth-child(2)').html(testCounter.passed);
         }
         else if(buttonText.slice(0, 6) == 'Failed') {
             $(selectedItem).attr('data-state', 'failed');
+            
+            testCounter.failed++;
+            
+            $('#testFailed td:nth-child(2)').html(testCounter.failed);
         }
         else if(buttonText == 'Not Relevant') {
             $(selectedItem).attr('data-state', 'notRelevant');
+            
+            testCounter.notRelevant++;
+            
+            $('#testNotRelevant td:nth-child(2)').html(testCounter.notRelevant);
         }
         else if(buttonText == 'Not Tested') {
             $(selectedItem).attr('data-state', 'notTested');
+            
+            testCounter.notTested++;
+            
+            $('#testNotTested td:nth-child(2)').html(testCounter.notTested);
         }
         
+        $('#testTotal th:nth-child(2)').html(testCounter.passed+testCounter.failed+testCounter.notRelevant+testCounter.notTested);
+
         // average test time
         testTimeArray.push(new Date());
         if(testTimeArray.length > 11) {
@@ -236,6 +255,18 @@ $(document).ready(function() {
             var avTime = (diff/(testTimeArray.length-1))/1000;
             $('#testAvTime').html('Av. time: ' + avTime.toFixed(2) + 's');
         }
+    });
+    
+    $(document).on("click", "#clickExpand", function() {
+        $('#testCounter').closest('td').toggle();
+    });
+
+    $(document).on("click", "#testCounter", function() {
+        $('#testPassed td:nth-child(2)').html('0');
+        $('#testFailed td:nth-child(2)').html('0');
+        $('#testNotRelevant td:nth-child(2)').html('0');
+        $('#testNotTested td:nth-child(2)').html('0');
+        $('#testTotal th:nth-child(2)').html('0');
     });
     
     $(document).on("click", ".GGAJDYPMKB-com-polarion-portal-js-viewers-querypanel-SearchQueryButton-CSSSearch-Css", function() {
@@ -297,7 +328,7 @@ function runScript() {
     var head = $('head');
     var css = '#ExtraTestMenuButton {background-size:18px;width:18px;height:18px;margin:7px;opacity:0.5;} #ExtraTestMenuButton:hover {opacity:1.0;} ';
     css += '#ExtraTestMenuButton {background-image: url(data:image/png;base64,' + menuImage + ')} ';
-    css += '#ExtraTestMenu {display: none; position: absolute; top: 30px; left: 10px; border: 1px solid black; background-color: #D8D8D8; z-index: 5;} ';
+    css += '#ExtraTestMenu {display: none; position: absolute; top: 30px; left: 10px; border: 1px solid rgb(169, 169, 169); background-color: #D8D8D8; z-index: 5;} ';
     css += '#ExtraTestMenuButton:hover {cursor: pointer;} ';
     css += '#ItemMarkPopup {display: none; position: absolute; width: 100px; top: 40px; left: 10px; border: 1px solid black; background-color: #F7F7F7; z-index: 5;} ';
     css += '.ItemMarkEl {display: inline-block; height: 20px; width: 90px; margin: 2px;} ';
@@ -308,7 +339,15 @@ function runScript() {
     css += '.JSTreeTableRow[data-state="notTested"], .ItemMarkEl[data-state="notTested"] {background-color: #D7DD46;} .JSTreeTableRow[data-state="notTested"]:hover, .ItemMarkEl[data-state="notTested"]:hover {background-color: #C3C947;} ';
     css += '#testAvTime {margin-left: 5px;} ';
     css += '#testAvTime:hover {cursor: pointer;} ';
-    css += '#ItemMarkMenu {position:relative;}';
+    css += '#ItemMarkMenu {position:relative;} ';
+    css += '#testCounter:hover {cursor: pointer;} ';
+    css += '#testCounter td, #testCounter th {padding: 0 5px; text-align: left;} ';
+    css += '#MenuSeperate {-webkit-user-select: none; position: relative;} ';
+    css += '#MenuSeperate hr {margin: 3px 0; width: 140px;} ';
+    css += '#clickExpand {position: absolute; right: 0; top: -3px; opacity: 0.5; background-image: url(https://polarion.server.technisat-digital/polarion/ria/images/bubble_panel/savedQueries.png); width: 16px; height: 16px;} ';
+    css += '#clickExpand:hover {opacity: 1.0; cursor: pointer;} ';
+    css += '#AutoClickButton {width: 147px; margin: 2px; padding: 2px;} ';
+    css += '#TestCaseMessage {width: 149px; margin: 2px; padding: 2px;} ';
     head.append('<style type="text/css">' + css + '</style>');
     
     var tbody = $('.polarion-NavigationPanelSettingsShortcuts').children('tbody');
@@ -330,6 +369,14 @@ function runScript() {
                             + '</form>'
                         + '</td></tr>'
                         + '<tr><td><div id="testAvTime">Av. time: -</div></td></tr>'
+    					+ '<tr><td id="MenuSeperate"><hr><span id="clickExpand"></span></td></tr>'
+    					+ '<tr><td style="display: none;"><table id="testCounter">'
+                            + '<tr id="testPassed"><td>Passed</td><td>0</td></tr>'
+                            + '<tr id="testFailed"><td>Failed</td><td>0</td></tr>'
+                            + '<tr id="testNotRelevant"><td>Not relevant</td><td>0</td></tr>'
+                            + '<tr id="testNotTested"><td>Not tested</td><td>0</td></tr>'
+    						+ '<tr id="testTotal"><th>Total</th><th>0</th></tr>'
+    					+ '</table></td></tr>'
                     + '</table>';
     
     var menu = $('#ExtraTestMenu');
