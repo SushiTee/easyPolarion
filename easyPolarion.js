@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       easyPolarion
 // @namespace  https://polarion.server
-// @version    0.1.6
+// @version    0.1.7
 // @description  Script to make the life with Polarion easier
 // @include    /^https?://polarion\.server.*/polarion/.*
 // @noframes
@@ -58,12 +58,12 @@ function waitForFnc(){
 function expand() {
     if(expanded == 0) {
         addGlobalStyle('.JSTreeTableRow .fixed .content { white-space: normal !important; height: auto !important; } .JSTreeTableRow .fixed { height: auto !important; }');
-        $('#ExpandDescription').html('Description (on)');
+        $('#ExpandDescription').find('.gwt-Label').html('Description (on)');
         expanded = 1;
     }
     else {
         removeGlobalStyle();
-        $('#ExpandDescription').html('Description (off)');
+        $('#ExpandDescription').find('.gwt-Label').html('Description (off)');
         expanded = 0;
     }
 }
@@ -75,14 +75,14 @@ function startMainLoop() {
 function stopAutoClick() {
     var button = $('#AutoClick');
 	$(button).attr('data-state', 'off');
-    $(button).html('AutoClick (off)');
+    $(button).find('.gwt-Label').html('AutoClick (off)');
     autoClickActive = false;
 }
 
 function startAutoClick() {
     var button = $('#AutoClick');
     $(button).attr('data-state', 'on');
-    $(button).html('AutoClick (on)');
+    $(button).find('.gwt-Label').html('AutoClick (on)');
     autoClickActive = true;
 }
 
@@ -158,7 +158,7 @@ function addMarkMenu() {
         return;
     }
 
-    $(searchField).next().next().after('<td id="ItemMarkMenu" data-menu="off" class="GGAJDYPGKB-com-polarion-portal-js-viewers-querypanel-AbstractQueryPanel-CSS-Cell">'
+    $(searchField).next().next().after('<td id="ItemMarkMenu" data-menu="off">'
                                            + '<div id="ItemMarkPopup">'
                                                + '<table>'
                                                     + '<tr><td><div class="ItemMarkEl" data-state="none">Default</div></td></tr>'
@@ -181,6 +181,12 @@ function addMarkMenu() {
                                        + '</td>');
 }
 
+function toggleMenu() {
+    $('.polarion-NavigationPanel').toggle();
+
+    $('#ExtraTestMenu').toggle();
+}
+
 $(document).ready(function() {
 	waitForFnc();
 
@@ -198,8 +204,24 @@ $(document).ready(function() {
         }
     });
     
-    $(document).on("click", "#ExtraTestMenuButton", function() {
-    	$('#ExtraTestMenu').toggle();
+    $(document).on("click", "#ExtraTestMenuButtonShow", function() {
+        toggleMenu();
+    });
+    
+    $(document).on("click", "#ExtraTestMenuButtonHide", function() {
+        toggleMenu();
+    });
+    
+    $(document).on("click", ".arrow", function() {
+        var classAttr = $(this).attr('class');
+        if(classAttr == 'arrow right') {
+            $(this).attr('class', 'arrow down');
+        }
+        else {
+            $(this).attr('class', 'arrow right');
+        }
+        
+        $(this).parent('.testMenuHeadline').next('.testMenuItem').slideToggle(150);
     });
     
     $(document).on('click', '.polarion-ExecuteTest-buttons', function() {
@@ -255,10 +277,6 @@ $(document).ready(function() {
             var avTime = (diff/(testTimeArray.length-1))/1000;
             $('#testAvTime').html('Av. time: ' + avTime.toFixed(2) + 's');
         }
-    });
-    
-    $(document).on("click", "#clickExpand", function() {
-        $('#testCounter').closest('td').toggle();
     });
 
     $(document).on("click", "#testCounter", function() {
@@ -326,39 +344,85 @@ function runScript() {
 
     // css stuff
     var head = $('head');
-    var css = '#ExtraTestMenuButton {background-size:18px;width:18px;height:18px;margin:7px;opacity:0.5;} #ExtraTestMenuButton:hover {opacity:1.0;} ';
-    css += '#ExtraTestMenuButton {background-image: url(data:image/png;base64,' + menuImage + ')} ';
-    css += '#ExtraTestMenu {display: none; position: absolute; top: 30px; left: 10px; border: 1px solid rgb(169, 169, 169); background-color: #D8D8D8; z-index: 5;} ';
-    css += '#ExtraTestMenuButton:hover {cursor: pointer;} ';
-    css += '#ItemMarkPopup {display: none; position: absolute; width: 100px; top: 40px; left: 10px; border: 1px solid black; background-color: #F7F7F7; z-index: 5;} ';
-    css += '.ItemMarkEl {display: inline-block; height: 20px; width: 90px; margin: 2px;} ';
-    css += '.ItemMarkEl:hover {cursor: pointer;} ';
-    css += '.JSTreeTableRow[data-state="passed"], .ItemMarkEl[data-state="passed"] {background-color: #B3EBA2;} .JSTreeTableRow[data-state="passed"]:hover, .ItemMarkEl[data-state="passed"]:hover {background-color: #A6D896;} ';
-    css += '.JSTreeTableRow[data-state="failed"], .ItemMarkEl[data-state="failed"] {background-color: #C94F4F;} .JSTreeTableRow[data-state="failed"]:hover, .ItemMarkEl[data-state="failed"]:hover {background-color: #A73838;} ';
-    css += '.JSTreeTableRow[data-state="notRelevant"], .ItemMarkEl[data-state="notRelevant"] {background-color: #AB61DD;} .JSTreeTableRow[data-state="notRelevant"]:hover, .ItemMarkEl[data-state="notRelevant"]:hover {background-color: #894BB3;} ';
-    css += '.JSTreeTableRow[data-state="notTested"], .ItemMarkEl[data-state="notTested"] {background-color: #D7DD46;} .JSTreeTableRow[data-state="notTested"]:hover, .ItemMarkEl[data-state="notTested"]:hover {background-color: #C3C947;} ';
-    css += '#testAvTime {margin-left: 5px;} ';
-    css += '#testAvTime:hover {cursor: pointer;} ';
-    css += '#ItemMarkMenu {position:relative;} ';
-    css += '#testCounter:hover {cursor: pointer;} ';
-    css += '#testCounter td, #testCounter th {padding: 0 5px; text-align: left;} ';
-    css += '#MenuSeperate {-webkit-user-select: none; position: relative;} ';
-    css += '#MenuSeperate hr {margin: 3px 0; width: 140px;} ';
-    css += '#clickExpand {position: absolute; right: 0; top: -3px; opacity: 0.5; background-image: url(https://polarion.server.technisat-digital/polarion/ria/images/bubble_panel/savedQueries.png); width: 16px; height: 16px;} ';
-    css += '#clickExpand:hover {opacity: 1.0; cursor: pointer;} ';
-    css += '#AutoClickButton {width: 147px; margin: 2px; padding: 2px;} ';
-    css += '#TestCaseMessage {width: 149px; margin: 2px; padding: 2px;} ';
+    var css = '#ExtraTestMenuButtonShow {background-size:18px;width:18px;height:18px;margin:7px;opacity:0.5;background-image: url(data:image/png;base64,' + menuImage + ');} #ExtraTestMenuButtonShow:hover {cursor: pointer; opacity:1.0;} '
+            + '#ExtraTestMenu {display: none; width: 100%; height: 100%;} '
+            + '#ExtraTestMenu td {padding: 0;} '
+            + '#ExtraTestMenu .action {width: auto; padding: 8px 0px; width: 100%;} #ExtraTestMenu .action:hover {background-image: url(/polarion/ria/images/backgrounds/navigator_dark_bg_selected.png);} '
+            + '#ExtraTestMenu .action .icon {display: inline; padding: 0px 5px 0px 20px;} '
+            + '#ExtraTestMenu .action .gwt-Label {display: inline-table; vertical-align: middle; margin-left: 6px;} '
+            + '#ExtraTestMenu .action .gwt-Image {vertical-align: middle;} '
+            + '#ExtraTestMenuButtonHide {border-spacing: 5px;} '
+            + '#ExtraTestMenuButtonHide img, #ExtraTestMenuButtonHide div {vertical-align: middle;} '
+            + '#ExtraTestMenuButtonHide:hover {cursor: pointer;} '
+    		+ '.testMenuHeadline {position: relative; height: 10px; display: inline-block; -webkit-user-select: none; -moz-user-select: none; user-select: none; margin: 5px 0;} '
+    		+ '.testMenuHeadline:hover .arrow {cursor: pointer;} '
+    		+ '.testMenuHeadline .arrow {width: 0; height: 0; float: left;} '
+    		+ '.testMenuHeadline .arrow.right {margin: 3px 8px; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 5px solid white;} '
+    		+ '.testMenuHeadline .arrow.down {margin: 5px 5px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 5px solid white;} '
+    		+ '.testMenuHeadlineText {position: absolute; top: 0; left: 22px;}'
+            + '#ItemMarkPopup {display: none; position: absolute; width: 100px; top: 36px; left: 2px; background-color: white; border-radius: 2px; border: 1px solid #dedede; -moz-box-shadow: 1px 1px 2px #e0dede; -webkit-box-shadow: 1px 1px 2px #e0dede; box-shadow: 1px 1px 2px #e0dede; font-size: 12px; overflow: auto; z-index: 5;} '
+            + '#ItemMarkPopup table {font-weight: bold;} '
+            + '.ItemMarkEl {display: table-cell; height: 20px; width: 90px; margin: 2px; vertical-align: middle;} '
+            + '.ItemMarkEl:hover {cursor: pointer;} '
+            + '.ItemMarkEl[data-state="none"]:hover {background-color: #f5f5f5;} '
+            + '.JSTreeTableRow[data-state="passed"], .ItemMarkEl[data-state="passed"] {background-color: #B3EBA2;} .JSTreeTableRow[data-state="passed"]:hover, .ItemMarkEl[data-state="passed"]:hover {background-color: #A6D896;} '
+            + '.JSTreeTableRow[data-state="failed"], .ItemMarkEl[data-state="failed"] {background-color: #C94F4F;} .JSTreeTableRow[data-state="failed"]:hover, .ItemMarkEl[data-state="failed"]:hover {background-color: #A73838;} '
+            + '.JSTreeTableRow[data-state="notRelevant"], .ItemMarkEl[data-state="notRelevant"] {background-color: #AB61DD;} .JSTreeTableRow[data-state="notRelevant"]:hover, .ItemMarkEl[data-state="notRelevant"]:hover {background-color: #894BB3;} '
+            + '.JSTreeTableRow[data-state="notTested"], .ItemMarkEl[data-state="notTested"] {background-color: #D7DD46;} .JSTreeTableRow[data-state="notTested"]:hover, .ItemMarkEl[data-state="notTested"]:hover {background-color: #C3C947;} '
+            + '#testAvTime {margin-left: 5px;} '
+            + '#testAvTime:hover {cursor: pointer;} '
+            + '#ItemMarkMenu {position:relative;} '
+            + '#ItemMarkMenuButton:hover {border: 1px solid #cecece;-webkit-box-shadow: 0 0 2px #e0dede;box-shadow: 0 0 2px #e0dede;border-radius: 2px;} '
+            + '#testCounter:hover {cursor: pointer;} '
+            + '#testCounter td, #testCounter th {padding: 0 5px; text-align: left;} '
+            + '#MenuSeperate {-webkit-user-select: none; position: relative;} '
+            + '#MenuSeperate hr {margin: 3px 0; width: 140px;} '
+            + '#AutoClickButton {width: 147px; margin: 2px; padding: 2px;} '
+            + '#TestCaseMessage {width: 149px; margin: 2px; padding: 2px;} ';
     head.append('<style type="text/css">' + css + '</style>');
     
+    // set an id for simple use later
+    $('.polarion-NavigationPanel').parent('div').attr('id', 'navigationPanel');
+
     var tbody = $('.polarion-NavigationPanelSettingsShortcuts').children('tbody');
     if(tbody.length == 0) {
         tbody = $('.polarion-NavigationPanelSettingsShortcuts');
     }
-    tbody.children('tr').append('<td><div id="ExtraTestMenuButton"></div></td><td><div id="ExtraTestMenu"></div></td>');
+    tbody.children('tr').append('<td><div id="ExtraTestMenuButtonShow"></div></td>');
     
-    var menuHtml = '<table>'
-                        + '<tr><td><button id="ExpandDescription">Description (off)</button></td></tr>'
-                        + '<tr><td><button id="AutoClick" data-state="off">AutoClick (off)</button></td></tr>'
+    var menuHtml = '<table id="ExtraTestMenuButtonHide">'
+    					+ '<tr>'
+    						+ '<td><img src="/polarion/ria/images/portal/settings_on.png"></td>'
+    						+ '<td><div>Hide</div></td>'
+    						+ '<td><img src="/polarion/ria/images/portal/button_arrow_up.png"></td>'
+    					+ '</tr>'
+    				+ '</table>'
+    				+ '<div class="testMenuHeadline"><div class="arrow down"></div><div class="testMenuHeadlineText">Description</div></div>'
+    				+ '<div class="testMenuItem">'
+    				+ '<table style="width: 100%; border-spacing: 0;">'
+    					+ '<tr id="ExpandDescription">'
+    						+ '<td>'
+    							+ '<div class="action">'
+    								+ '<div class="icon"><img src="/polarion/icons/default/topicIcons/documentsAndWiki.png" class="gwt-Image"></div>'
+    								+ '<div class="gwt-Label">Description (off)</div>'
+    							+ '</div>'
+    						+ '</td>'
+    					+ '</tr>'
+    				+ '</table>'
+    				+ '</div>'
+    				+ '<div class="testMenuHeadline"><div class="arrow down"></div><div class="testMenuHeadlineText">AutoClick</div></div>'
+    				+ '<div class="testMenuItem">'
+    				+ '<table style="width: 100%; border-spacing: 0;">'
+    					+ '<tr id="AutoClick" data-state="off">'
+    						+ '<td>'
+    							+ '<div class="action">'
+    								+ '<div class="icon"><img src="/polarion/icons/default/topicIcons/Arrows_04-squiggle.png" class="gwt-Image"></div>'
+    								+ '<div class="gwt-Label">AutoClick (off)</div>'
+    							+ '</div>'
+    						+ '</td>'
+    					+ '</tr>'
+                    + '</table>'
+    				+ '<table style="width: 100%; padding: 4px;">'
                         + '<tr><td><input id="AutoClickButton" type="text" placeholder="Buttontext"/></td></tr>'
                         + '<tr><td><textarea id="TestCaseMessage" placeholder="Test case comment"></textarea></td></tr>'
                         + '<tr><td>'
@@ -368,19 +432,26 @@ function runScript() {
                                 + '<input type="radio" name="testSetting" value="stop">Stop at headline'
                             + '</form>'
                         + '</td></tr>'
+    				+ '</table>'
+    				+ '</div>'
+    				+ '<div class="testMenuHeadline"><div class="arrow right"></div><div class="testMenuHeadlineText">Statistics</div></div>'
+    				+ '<div class="testMenuItem" style="display: none;">'
+    				+ '<table style="width: 100%; padding: 4px;">'
                         + '<tr><td><div id="testAvTime">Av. time: -</div></td></tr>'
-    					+ '<tr><td id="MenuSeperate"><hr><span id="clickExpand"></span></td></tr>'
-    					+ '<tr><td style="display: none;"><table id="testCounter">'
+    					+ '<tr><td id="MenuSeperate"><div class="polarion-SettingsSeparator" style="height: 1px; margin: 5px 0;"></div></td></tr>'
+    					+ '<tr><td><table id="testCounter">'
                             + '<tr id="testPassed"><td>Passed</td><td>0</td></tr>'
                             + '<tr id="testFailed"><td>Failed</td><td>0</td></tr>'
                             + '<tr id="testNotRelevant"><td>Not relevant</td><td>0</td></tr>'
                             + '<tr id="testNotTested"><td>Not tested</td><td>0</td></tr>'
     						+ '<tr id="testTotal"><th>Total</th><th>0</th></tr>'
     					+ '</table></td></tr>'
-                    + '</table>';
+                    + '</table>'
+    				+ '</div>';
     
-    var menu = $('#ExtraTestMenu');
-    $(menu).html(menuHtml);
+    //var menu = $('#ExtraTestMenu');
+    var menu = $('#navigationPanel');
+    $(menu).append('<div id="ExtraTestMenu" class="polarion-SettingsPanel">' + menuHtml + '</div>');
 }
 
 function autoClick() {
