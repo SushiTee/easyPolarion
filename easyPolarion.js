@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       easyPolarion
 // @namespace  https://polarion.server
-// @version    0.1.9
+// @version    0.1.10
 // @description  Script to make the life with Polarion easier
 // @include    /^https?://polarion\.server.*/polarion/.*$/
 // @grant      none
@@ -186,6 +186,14 @@ function toggleMenu() {
     $('.polarion-NavigationPanel').toggle();
 
     $('#ExtraTestMenu').toggle();
+    
+    // menu splitter
+    if($('#ExtraTestMenu').css('display') == 'none') {
+        $('.polarion-PortalBaseSplitter').css('background-color', 'rgb(231, 231, 231)');
+    }
+    else {
+        $('.polarion-PortalBaseSplitter').css('background-color', 'rgb(70, 72, 82)');
+    }
 }
 
 $(document).ready(function() {
@@ -424,7 +432,18 @@ function runScript() {
     					+ '</tr>'
                     + '</table>'
     				+ '<table style="width: 100%; padding: 4px;">'
-                        + '<tr><td><input id="AutoClickButton" type="text" placeholder="Buttontext"/></td></tr>'
+                        + '<!--<tr><td><input id="AutoClickButton" type="text" placeholder="Buttontext"/></td></tr>-->'
+    					+ '<tr><td>'
+    						+ '<select id="AutoClickButton">'
+    							+ '<option value="Passed" selected="True">Passed</option>'
+    							+ '<option value="Failed Always">Failed Always</option>'
+    							+ '<option value="Failed Often">Failed Often</option>'
+    							+ '<option value="Failed Several Times">Failed Several Times</option>'
+    							+ '<option value="Failed Once">Failed Once</option>'
+        						+ '<option value="Not Relevant">Not Relevant</option>'
+        						+ '<option value="Not Tested">Not Tested</option>'
+    						+ '</select>'
+    					+ '</td></tr>'
                         + '<tr><td><textarea id="TestCaseMessage" placeholder="Test case comment"></textarea></td></tr>'
                         + '<tr><td>'
                             + '<form>'
@@ -461,6 +480,7 @@ function autoClick() {
     }
 
     var AutoClickButton = $('#AutoClickButton').val();
+
     if(!AutoClickButton) {
         AutoClickButton = 'Passed';
     }
