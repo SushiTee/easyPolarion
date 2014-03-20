@@ -1,9 +1,10 @@
 // ==UserScript==
 // @name       easyPolarion
 // @namespace  https://polarion.server
-// @version    0.1.8
+// @version    0.1.9
 // @description  Script to make the life with Polarion easier
-// @include    /^https?://polarion\.server.*/polarion/.*
+// @include    /^https?://polarion\.server.*/polarion/.*$/
+// @grant      none
 // @noframes
 // @require    http://code.jquery.com/jquery-latest.js
 // @updateURL  https://raw.github.com/SushiTee/easyPolarion/master/easyPolarion.js
@@ -47,7 +48,7 @@ function removeGlobalStyle() {
 
 function waitForFnc(){
     var done = $('.polarion-NavigationPanelSettingsShortcuts');
-    if(done.length <= 0){
+    if(!done || done.length <= 0){
         window.setTimeout(waitForFnc,200);
     }
     else {
@@ -159,7 +160,7 @@ function addMarkMenu() {
     }
 
     $(searchField).next().next().after('<td id="ItemMarkMenu" data-menu="off">'
-                                           + '<div id="ItemMarkPopup">'
+                                           + '<div style="position: relative;"><div id="ItemMarkPopup">'
                                                + '<table>'
                                                     + '<tr><td><div class="ItemMarkEl" data-state="none">Default</div></td></tr>'
                                                     + '<tr><td><div class="ItemMarkEl" data-state="passed"></div></td></tr>'
@@ -167,7 +168,7 @@ function addMarkMenu() {
                                                     + '<tr><td><div class="ItemMarkEl" data-state="notRelevant"></div></td></tr>'
                                                     + '<tr><td><div class="ItemMarkEl" data-state="notTested"></div></td></tr>'
                                                 + '</table>'
-                                            + '</div>'
+                                            + '</div></div>'
                                             + '<table id="ItemMarkMenuButton" cellspacing="0" cellpadding="0" class="GGAJDYPB1B-com-polarion-reina-web-js-widgets-toolbar-ToolbarPopupButton-CSS2-Button">'
                                                 + '<tr>'
                                                     + '<td class="GGAJDYPASB-com-polarion-reina-web-js-widgets-JSPopupButton-CSS-IconCellStyle GGAJDYPBSB-com-polarion-reina-web-js-widgets-JSPopupButton-CSS-IconCellStyleWithoutText" valign="middle" title="Show Sidebar">'
@@ -360,7 +361,7 @@ function runScript() {
     		+ '.testMenuHeadline .arrow.right {margin: 3px 8px; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 5px solid white;} '
     		+ '.testMenuHeadline .arrow.down {margin: 5px 5px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 5px solid white;} '
     		+ '.testMenuHeadlineText {position: absolute; top: 0; left: 22px;}'
-            + '#ItemMarkPopup {display: none; position: absolute; width: 100px; top: 36px; left: 2px; background-color: white; border-radius: 2px; border: 1px solid #dedede; -moz-box-shadow: 1px 1px 2px #e0dede; -webkit-box-shadow: 1px 1px 2px #e0dede; box-shadow: 1px 1px 2px #e0dede; font-size: 12px; overflow: auto; z-index: 5;} '
+            + '#ItemMarkPopup {display: none; position: absolute; width: 100px; top: 27px; left: 0; background-color: white; border-radius: 2px; border: 1px solid #dedede; -moz-box-shadow: 1px 1px 2px #e0dede; -webkit-box-shadow: 1px 1px 2px #e0dede; box-shadow: 1px 1px 2px #e0dede; font-size: 12px; overflow: auto; z-index: 5;} '
             + '#ItemMarkPopup table {font-weight: bold;} '
             + '.ItemMarkEl {display: table-cell; height: 20px; width: 90px; margin: 2px; vertical-align: middle;} '
             + '.ItemMarkEl:hover {cursor: pointer;} '
