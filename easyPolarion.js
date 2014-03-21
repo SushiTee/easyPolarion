@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       easyPolarion
 // @namespace  https://polarion.server
-// @version    0.1.10
+// @version    0.1.11
 // @description  Script to make the life with Polarion easier
 // @include    /^https?://polarion\.server.*/polarion/.*$/
 // @grant      none
@@ -35,6 +35,127 @@ var menuImage = 'iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QA
                 + 'u4YhPvZ/8XATrSHEqLOdSonk54BCpHYewPvuOiFY17jhWZ82hvcnIyF/m3PIygs7PzaXR0IMbtEp2EDw2/WhKWHvPIQE8T0Dg5aWnUi+8lUwJas6urS1pbW+sHwb/jAp3'
                 + '6BLrSsrS0NBGHZkdHRwU2La2urk5AzXh+fv4ai86pSfW0IvbscI8pQW9vr255eVmLCfAzMG+ccB+8awFA/+3t7SbYrBwqPsP6FJP2LseJlZWVsLa2Fo2NjfqDg4MZ7PnG'
 				+ 'lADfgR8fzS47DsVT+4dzB6AfYL1r3ICJaYO09ZaUlGzX1dUJTEsBIKbhQ+MenLuI56u4vo91+T//10FSfkgQ/igbCSv7PED/AExELp7pn1dSAAAAAElFTkSuQmCC';
+var autoClickImage = 'iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMAAAsTAAALEwEAmpwYAAAK'
+                       	+ 'T2lDQ1BQaG90b3Nob3AgSUNDIHByb2ZpbGUAAHjanVNnVFPpFj333vRCS4iAlEtvUhUIIFJCi4AU'
+                       	+ 'kSYqIQkQSoghodkVUcERRUUEG8igiAOOjoCMFVEsDIoK2AfkIaKOg6OIisr74Xuja9a89+bN/rXX'
+                       	+ 'Pues852zzwfACAyWSDNRNYAMqUIeEeCDx8TG4eQuQIEKJHAAEAizZCFz/SMBAPh+PDwrIsAHvgAB'
+                       	+ 'eNMLCADATZvAMByH/w/qQplcAYCEAcB0kThLCIAUAEB6jkKmAEBGAYCdmCZTAKAEAGDLY2LjAFAt'
+                      	+ 'AGAnf+bTAICd+Jl7AQBblCEVAaCRACATZYhEAGg7AKzPVopFAFgwABRmS8Q5ANgtADBJV2ZIALC3'
+                        + 'AMDOEAuyAAgMADBRiIUpAAR7AGDIIyN4AISZABRG8lc88SuuEOcqAAB4mbI8uSQ5RYFbCC1xB1dX'
+                        + 'Lh4ozkkXKxQ2YQJhmkAuwnmZGTKBNA/g88wAAKCRFRHgg/P9eM4Ors7ONo62Dl8t6r8G/yJiYuP+'
+                        + '5c+rcEAAAOF0ftH+LC+zGoA7BoBt/qIl7gRoXgugdfeLZrIPQLUAoOnaV/Nw+H48PEWhkLnZ2eXk'
+                        + '5NhKxEJbYcpXff5nwl/AV/1s+X48/Pf14L7iJIEyXYFHBPjgwsz0TKUcz5IJhGLc5o9H/LcL//wd'
+                        + '0yLESWK5WCoU41EScY5EmozzMqUiiUKSKcUl0v9k4t8s+wM+3zUAsGo+AXuRLahdYwP2SycQWHTA'
+                        + '4vcAAPK7b8HUKAgDgGiD4c93/+8//UegJQCAZkmScQAAXkQkLlTKsz/HCAAARKCBKrBBG/TBGCzA'
+                        + 'BhzBBdzBC/xgNoRCJMTCQhBCCmSAHHJgKayCQiiGzbAdKmAv1EAdNMBRaIaTcA4uwlW4Dj1wD/ph'
+                        + 'CJ7BKLyBCQRByAgTYSHaiAFiilgjjggXmYX4IcFIBBKLJCDJiBRRIkuRNUgxUopUIFVIHfI9cgI5'
+                        + 'h1xGupE7yAAygvyGvEcxlIGyUT3UDLVDuag3GoRGogvQZHQxmo8WoJvQcrQaPYw2oefQq2gP2o8+'
+                        + 'Q8cwwOgYBzPEbDAuxsNCsTgsCZNjy7EirAyrxhqwVqwDu4n1Y8+xdwQSgUXACTYEd0IgYR5BSFhM'
+                        + 'WE7YSKggHCQ0EdoJNwkDhFHCJyKTqEu0JroR+cQYYjIxh1hILCPWEo8TLxB7iEPENyQSiUMyJ7mQ'
+                        + 'AkmxpFTSEtJG0m5SI+ksqZs0SBojk8naZGuyBzmULCAryIXkneTD5DPkG+Qh8lsKnWJAcaT4U+Io'
+                        + 'UspqShnlEOU05QZlmDJBVaOaUt2ooVQRNY9aQq2htlKvUYeoEzR1mjnNgxZJS6WtopXTGmgXaPdp'
+                        + 'r+h0uhHdlR5Ol9BX0svpR+iX6AP0dwwNhhWDx4hnKBmbGAcYZxl3GK+YTKYZ04sZx1QwNzHrmOeZ'
+                        + 'D5lvVVgqtip8FZHKCpVKlSaVGyovVKmqpqreqgtV81XLVI+pXlN9rkZVM1PjqQnUlqtVqp1Q61Mb'
+                        + 'U2epO6iHqmeob1Q/pH5Z/YkGWcNMw09DpFGgsV/jvMYgC2MZs3gsIWsNq4Z1gTXEJrHN2Xx2KruY'
+                        + '/R27iz2qqaE5QzNKM1ezUvOUZj8H45hx+Jx0TgnnKKeX836K3hTvKeIpG6Y0TLkxZVxrqpaXllir'
+                        + 'SKtRq0frvTau7aedpr1Fu1n7gQ5Bx0onXCdHZ4/OBZ3nU9lT3acKpxZNPTr1ri6qa6UbobtEd79u'
+                        + 'p+6Ynr5egJ5Mb6feeb3n+hx9L/1U/W36p/VHDFgGswwkBtsMzhg8xTVxbzwdL8fb8VFDXcNAQ6Vh'
+                        + 'lWGX4YSRudE8o9VGjUYPjGnGXOMk423GbcajJgYmISZLTepN7ppSTbmmKaY7TDtMx83MzaLN1pk1'
+                        + 'mz0x1zLnm+eb15vft2BaeFostqi2uGVJsuRaplnutrxuhVo5WaVYVVpds0atna0l1rutu6cRp7lO'
+                        + 'k06rntZnw7Dxtsm2qbcZsOXYBtuutm22fWFnYhdnt8Wuw+6TvZN9un2N/T0HDYfZDqsdWh1+c7Ry'
+                        + 'FDpWOt6azpzuP33F9JbpL2dYzxDP2DPjthPLKcRpnVOb00dnF2e5c4PziIuJS4LLLpc+Lpsbxt3I'
+                        + 'veRKdPVxXeF60vWdm7Obwu2o26/uNu5p7ofcn8w0nymeWTNz0MPIQ+BR5dE/C5+VMGvfrH5PQ0+B'
+                        + 'Z7XnIy9jL5FXrdewt6V3qvdh7xc+9j5yn+M+4zw33jLeWV/MN8C3yLfLT8Nvnl+F30N/I/9k/3r/'
+                        + '0QCngCUBZwOJgUGBWwL7+Hp8Ib+OPzrbZfay2e1BjKC5QRVBj4KtguXBrSFoyOyQrSH355jOkc5p'
+                        + 'DoVQfujW0Adh5mGLw34MJ4WHhVeGP45wiFga0TGXNXfR3ENz30T6RJZE3ptnMU85ry1KNSo+qi5q'
+                        + 'PNo3ujS6P8YuZlnM1VidWElsSxw5LiquNm5svt/87fOH4p3iC+N7F5gvyF1weaHOwvSFpxapLhIs'
+                        + 'OpZATIhOOJTwQRAqqBaMJfITdyWOCnnCHcJnIi/RNtGI2ENcKh5O8kgqTXqS7JG8NXkkxTOlLOW5'
+                        + 'hCepkLxMDUzdmzqeFpp2IG0yPTq9MYOSkZBxQqohTZO2Z+pn5mZ2y6xlhbL+xW6Lty8elQfJa7OQ'
+                        + 'rAVZLQq2QqboVFoo1yoHsmdlV2a/zYnKOZarnivN7cyzytuQN5zvn//tEsIS4ZK2pYZLVy0dWOa9'
+                        + 'rGo5sjxxedsK4xUFK4ZWBqw8uIq2Km3VT6vtV5eufr0mek1rgV7ByoLBtQFr6wtVCuWFfevc1+1d'
+                        + 'T1gvWd+1YfqGnRs+FYmKrhTbF5cVf9go3HjlG4dvyr+Z3JS0qavEuWTPZtJm6ebeLZ5bDpaql+aX'
+                        + 'Dm4N2dq0Dd9WtO319kXbL5fNKNu7g7ZDuaO/PLi8ZafJzs07P1SkVPRU+lQ27tLdtWHX+G7R7ht7'
+                        + 'vPY07NXbW7z3/T7JvttVAVVN1WbVZftJ+7P3P66Jqun4lvttXa1ObXHtxwPSA/0HIw6217nU1R3S'
+                        + 'PVRSj9Yr60cOxx++/p3vdy0NNg1VjZzG4iNwRHnk6fcJ3/ceDTradox7rOEH0x92HWcdL2pCmvKa'
+                        + 'RptTmvtbYlu6T8w+0dbq3nr8R9sfD5w0PFl5SvNUyWna6YLTk2fyz4ydlZ19fi753GDborZ752PO'
+                        + '32oPb++6EHTh0kX/i+c7vDvOXPK4dPKy2+UTV7hXmq86X23qdOo8/pPTT8e7nLuarrlca7nuer21'
+                        + 'e2b36RueN87d9L158Rb/1tWeOT3dvfN6b/fF9/XfFt1+cif9zsu72Xcn7q28T7xf9EDtQdlD3YfV'
+                        + 'P1v+3Njv3H9qwHeg89HcR/cGhYPP/pH1jw9DBY+Zj8uGDYbrnjg+OTniP3L96fynQ89kzyaeF/6i'
+                        + '/suuFxYvfvjV69fO0ZjRoZfyl5O/bXyl/erA6xmv28bCxh6+yXgzMV70VvvtwXfcdx3vo98PT+R8'
+                        + 'IH8o/2j5sfVT0Kf7kxmTk/8EA5jz/GMzLdsAAAAgY0hSTQAAeiUAAICDAAD5/wAAgOkAAHUwAADq'
+                        + 'YAAAOpgAABdvkl/FRgAAAmtJREFUeNrsls1t20AQhb8h16YomKAM5BDk5AIChMfcTHfgVOD44LOd'
+                        + 'CqJU4JRgVyCnAkkVmB1EqWDJg2VCJLU5eCkwin6TGDrEDxiIeKD2zczbnaUYY9gFHHYE2VXF/5/w'
+                        + 'zjx+FmGt9UettdFa9/+JsNY61lp/11r35vhTrXW3QZ0BKKViYKG4WiFyDUTA+eHh4cjS18CRUuo1'
+                        + '0AM+aK1P7XONWQIisl2r0zSNReRKROKDg4MecGQXikSEvb29FtCx3JmI4LouwOdacJXoRq0WkagW'
+                        + 'nsPQ/nYAHMcBGG1qm7IV3tu23gHfgHQL62OgrnjU5NYKW1GAUxszVFWFUoo0TY/WdAYg+WVxpVa3'
+                        + 'WkS+uK4786YZeZ6TZVlfRPo1N51Oqaqqk2VZZ87PbIHHw6UVh2HYtdVdFEXxpixLqqqaf3dWcVEU'
+                        + 'FEVxCVw2O/P4+Ph+MpnEfzoyo/F4/LUoimOA/f19ptPpLLaaTo6D4zhJWZa3QBKG4WDlrM6yrFsf'
+                        + 'jTAMAW7KsoweHh6i2julFEVRLOrMOgzCMDxRKzZKE+fj8TgWkX4t7HneQER+5Hl+BuD7PiJCWZZM'
+                        + 'JpN1p6D/N7N6mOf5TTNZpdQ58Knm2u02QRDQbrfxPA/XdfF9HyBett/fbX2/PnVp1KzW7u4TpVSi'
+                        + 'lIo9z4uAY+B2mXBzGm1ixTqkdjjdrbwk6oWbY7ApZqdUuiiBTZPaxONl8zcBEsdxbn3fnyXTTM5y'
+                        + 'bHMtDl3XfdtqtV4tOZsABEGQAlc2uQRIgiAAOLH38MDG7zDGLIuuMaZnjIkaXGyecG+M6az479p4'
+                        + '+bx9EX42/BwANxJCTOz37BAAAAAASUVORK5CYII=';
+var descriptionImage = 'iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMAAAsTAAALEwEAmpwYAAAK'
+                        + 'T2lDQ1BQaG90b3Nob3AgSUNDIHByb2ZpbGUAAHjanVNnVFPpFj333vRCS4iAlEtvUhUIIFJCi4AU'
+                        + 'kSYqIQkQSoghodkVUcERRUUEG8igiAOOjoCMFVEsDIoK2AfkIaKOg6OIisr74Xuja9a89+bN/rXX'
+                        + 'Pues852zzwfACAyWSDNRNYAMqUIeEeCDx8TG4eQuQIEKJHAAEAizZCFz/SMBAPh+PDwrIsAHvgAB'
+                        + 'eNMLCADATZvAMByH/w/qQplcAYCEAcB0kThLCIAUAEB6jkKmAEBGAYCdmCZTAKAEAGDLY2LjAFAt'
+                        + 'AGAnf+bTAICd+Jl7AQBblCEVAaCRACATZYhEAGg7AKzPVopFAFgwABRmS8Q5ANgtADBJV2ZIALC3'
+                        + 'AMDOEAuyAAgMADBRiIUpAAR7AGDIIyN4AISZABRG8lc88SuuEOcqAAB4mbI8uSQ5RYFbCC1xB1dX'
+                        + 'Lh4ozkkXKxQ2YQJhmkAuwnmZGTKBNA/g88wAAKCRFRHgg/P9eM4Ors7ONo62Dl8t6r8G/yJiYuP+'
+                        + '5c+rcEAAAOF0ftH+LC+zGoA7BoBt/qIl7gRoXgugdfeLZrIPQLUAoOnaV/Nw+H48PEWhkLnZ2eXk'
+                        + '5NhKxEJbYcpXff5nwl/AV/1s+X48/Pf14L7iJIEyXYFHBPjgwsz0TKUcz5IJhGLc5o9H/LcL//wd'
+                        + '0yLESWK5WCoU41EScY5EmozzMqUiiUKSKcUl0v9k4t8s+wM+3zUAsGo+AXuRLahdYwP2SycQWHTA'
+                        + '4vcAAPK7b8HUKAgDgGiD4c93/+8//UegJQCAZkmScQAAXkQkLlTKsz/HCAAARKCBKrBBG/TBGCzA'
+                        + 'BhzBBdzBC/xgNoRCJMTCQhBCCmSAHHJgKayCQiiGzbAdKmAv1EAdNMBRaIaTcA4uwlW4Dj1wD/ph'
+                        + 'CJ7BKLyBCQRByAgTYSHaiAFiilgjjggXmYX4IcFIBBKLJCDJiBRRIkuRNUgxUopUIFVIHfI9cgI5'
+                        + 'h1xGupE7yAAygvyGvEcxlIGyUT3UDLVDuag3GoRGogvQZHQxmo8WoJvQcrQaPYw2oefQq2gP2o8+'
+                        + 'Q8cwwOgYBzPEbDAuxsNCsTgsCZNjy7EirAyrxhqwVqwDu4n1Y8+xdwQSgUXACTYEd0IgYR5BSFhM'
+                        + 'WE7YSKggHCQ0EdoJNwkDhFHCJyKTqEu0JroR+cQYYjIxh1hILCPWEo8TLxB7iEPENyQSiUMyJ7mQ'
+                        + 'AkmxpFTSEtJG0m5SI+ksqZs0SBojk8naZGuyBzmULCAryIXkneTD5DPkG+Qh8lsKnWJAcaT4U+Io'
+                        + 'UspqShnlEOU05QZlmDJBVaOaUt2ooVQRNY9aQq2htlKvUYeoEzR1mjnNgxZJS6WtopXTGmgXaPdp'
+                        + 'r+h0uhHdlR5Ol9BX0svpR+iX6AP0dwwNhhWDx4hnKBmbGAcYZxl3GK+YTKYZ04sZx1QwNzHrmOeZ'
+                        + 'D5lvVVgqtip8FZHKCpVKlSaVGyovVKmqpqreqgtV81XLVI+pXlN9rkZVM1PjqQnUlqtVqp1Q61Mb'
+                        + 'U2epO6iHqmeob1Q/pH5Z/YkGWcNMw09DpFGgsV/jvMYgC2MZs3gsIWsNq4Z1gTXEJrHN2Xx2KruY'
+                        + '/R27iz2qqaE5QzNKM1ezUvOUZj8H45hx+Jx0TgnnKKeX836K3hTvKeIpG6Y0TLkxZVxrqpaXllir'
+                        + 'SKtRq0frvTau7aedpr1Fu1n7gQ5Bx0onXCdHZ4/OBZ3nU9lT3acKpxZNPTr1ri6qa6UbobtEd79u'
+                        + 'p+6Ynr5egJ5Mb6feeb3n+hx9L/1U/W36p/VHDFgGswwkBtsMzhg8xTVxbzwdL8fb8VFDXcNAQ6Vh'
+                        + 'lWGX4YSRudE8o9VGjUYPjGnGXOMk423GbcajJgYmISZLTepN7ppSTbmmKaY7TDtMx83MzaLN1pk1'
+                        + 'mz0x1zLnm+eb15vft2BaeFostqi2uGVJsuRaplnutrxuhVo5WaVYVVpds0atna0l1rutu6cRp7lO'
+                        + 'k06rntZnw7Dxtsm2qbcZsOXYBtuutm22fWFnYhdnt8Wuw+6TvZN9un2N/T0HDYfZDqsdWh1+c7Ry'
+                        + 'FDpWOt6azpzuP33F9JbpL2dYzxDP2DPjthPLKcRpnVOb00dnF2e5c4PziIuJS4LLLpc+Lpsbxt3I'
+                        + 'veRKdPVxXeF60vWdm7Obwu2o26/uNu5p7ofcn8w0nymeWTNz0MPIQ+BR5dE/C5+VMGvfrH5PQ0+B'
+                        + 'Z7XnIy9jL5FXrdewt6V3qvdh7xc+9j5yn+M+4zw33jLeWV/MN8C3yLfLT8Nvnl+F30N/I/9k/3r/'
+                        + '0QCngCUBZwOJgUGBWwL7+Hp8Ib+OPzrbZfay2e1BjKC5QRVBj4KtguXBrSFoyOyQrSH355jOkc5p'
+                        + 'DoVQfujW0Adh5mGLw34MJ4WHhVeGP45wiFga0TGXNXfR3ENz30T6RJZE3ptnMU85ry1KNSo+qi5q'
+                        + 'PNo3ujS6P8YuZlnM1VidWElsSxw5LiquNm5svt/87fOH4p3iC+N7F5gvyF1weaHOwvSFpxapLhIs'
+                        + 'OpZATIhOOJTwQRAqqBaMJfITdyWOCnnCHcJnIi/RNtGI2ENcKh5O8kgqTXqS7JG8NXkkxTOlLOW5'
+                        + 'hCepkLxMDUzdmzqeFpp2IG0yPTq9MYOSkZBxQqohTZO2Z+pn5mZ2y6xlhbL+xW6Lty8elQfJa7OQ'
+                        + 'rAVZLQq2QqboVFoo1yoHsmdlV2a/zYnKOZarnivN7cyzytuQN5zvn//tEsIS4ZK2pYZLVy0dWOa9'
+                        + 'rGo5sjxxedsK4xUFK4ZWBqw8uIq2Km3VT6vtV5eufr0mek1rgV7ByoLBtQFr6wtVCuWFfevc1+1d'
+                        + 'T1gvWd+1YfqGnRs+FYmKrhTbF5cVf9go3HjlG4dvyr+Z3JS0qavEuWTPZtJm6ebeLZ5bDpaql+aX'
+                        + 'Dm4N2dq0Dd9WtO319kXbL5fNKNu7g7ZDuaO/PLi8ZafJzs07P1SkVPRU+lQ27tLdtWHX+G7R7ht7'
+                        + 'vPY07NXbW7z3/T7JvttVAVVN1WbVZftJ+7P3P66Jqun4lvttXa1ObXHtxwPSA/0HIw6217nU1R3S'
+                        + 'PVRSj9Yr60cOxx++/p3vdy0NNg1VjZzG4iNwRHnk6fcJ3/ceDTradox7rOEH0x92HWcdL2pCmvKa'
+                        + 'RptTmvtbYlu6T8w+0dbq3nr8R9sfD5w0PFl5SvNUyWna6YLTk2fyz4ydlZ19fi753GDborZ752PO'
+                        + '32oPb++6EHTh0kX/i+c7vDvOXPK4dPKy2+UTV7hXmq86X23qdOo8/pPTT8e7nLuarrlca7nuer21'
+                        + 'e2b36RueN87d9L158Rb/1tWeOT3dvfN6b/fF9/XfFt1+cif9zsu72Xcn7q28T7xf9EDtQdlD3YfV'
+                        + 'P1v+3Njv3H9qwHeg89HcR/cGhYPP/pH1jw9DBY+Zj8uGDYbrnjg+OTniP3L96fynQ89kzyaeF/6i'
+                        + '/suuFxYvfvjV69fO0ZjRoZfyl5O/bXyl/erA6xmv28bCxh6+yXgzMV70VvvtwXfcdx3vo98PT+R8'
+                        + 'IH8o/2j5sfVT0Kf7kxmTk/8EA5jz/GMzLdsAAAAgY0hSTQAAeiUAAICDAAD5/wAAgOkAAHUwAADq'
+                        + 'YAAAOpgAABdvkl/FRgAAArRJREFUeNrkVrty2kAUPSstQmAEKzUae2AYjylcZFLYJZm0yT9k0qXN'
+                        + 'F+QrUmfyF6lpmdjjwk4fxgXYhbHAi6T1AtpU0sRCYBlwXORU2tXVnnvP3oeIUgovAQ0vhP+PmKY3'
+                        + 'wjBc+9I9z4Nt2/A8j6Tf7e3tPX/Etm2rF5P6MXK6SrYnkCwlz5I9kziua8ZYbuK/e0G6LzDG1Gg0'
+                        + 'IrkjXhej0SjTNwDk2YiXqZTlDH2i508iXCu51jlsI+J/NTRImsj3/VzM4/EYtVoNeW1PTk5IFEXQ'
+                        + 'NA0A3tJVxnkOXIW0Y0opEEJqrusOad6PVsH3fQyHQ9Tr9TiiBcznc5RKJZRKpXdHR0djbVu1e3Fx'
+                        + 'gclkstSmWCzCsqzP7Xb7J6X090bJ1ev1IISAlBKUUlxdXaHf7y+cIYRAo9H41Gw2fxiGwQCcL5X6'
+                        + '7u5uYa9arT5Y9/t9SClhGAZ0XUcYhri9vcV0OgUhBISQRGbLsr4xxl4DOF9Zx2mSLLRaLVQqFUyn'
+                        + 'U3S7Xezu7uLw8BCFQgG6riMIAoRhiNPT0/juzY3HIuccOzs7UEqBUgpd11EoFCClhO/7UEqhWCzC'
+                        + 'NE1QSuPo1UbEnPMH65ubmyTKWN7BYABKKQzDQBRF+TtX+nDLsgAgM3M1TUvKSCkFzjkYY4mtpmmJ'
+                        + 'Q4/26pgojUqlsrAXBAE0TcP9/T2q1Spc102SSwgB0zRhmiaCIOBCCDiOs72xSCkF5xzz+TwhVUoh'
+                        + 'iiIwxqCUwtnZ2cdms/ndcZzeVudxXMOEkET6+NnzPEgpv+zv738A8GphSAwGgwfZlwdSyiSL05jN'
+                        + 'Zri8vARjTNm2PXEcR5TL5RZd8v9L8hB2Op2kQbTbbbNcLhtpm+vr62Pf9zuu65J6vf4ewC8Ak61J'
+                        + 'PZvNBACR0Va7BwcHXxuNxhsAQwAcAP4MADNoMpotm3/6AAAAAElFTkSuQmCC';
 
 function addGlobalStyle(css) {
     var head = $('head');
@@ -54,6 +175,61 @@ function waitForFnc(){
     else {
         runScript();
     }
+}
+
+function makeSVG(tag, attrs) {
+    var el= document.createElementNS('http://www.w3.org/2000/svg', tag);
+    for (var k in attrs)
+        if (attrs.hasOwnProperty(k)) el.setAttribute(k, attrs[k]);
+    return el;
+}
+
+function drawArcs(paper, pieData){
+    var total = pieData.reduce(function (accu, that) { return that + accu; }, 0);
+    var sectorAngleArr = pieData.map(function (v) { return 360 * v / total; });
+    var colorArray = ['#B3EBA2', '#C94F4F', '#AB61DD', '#D7DD46'];
+    var arc;
+
+    var startAngle = 0;
+    var endAngle = 0;
+    for (var i=0; i<sectorAngleArr.length; i++){
+        if(sectorAngleArr[i] == 0) {
+            continue;
+        }
+        else if(sectorAngleArr[i] == 360) {
+            arc = makeSVG("circle", {class: "svgPie " + i, cx: "50%", cy: "50%", r: "50%", stroke: "#464852", fill: colorArray[i]});
+            paper.appendChild(arc);
+            return;
+        }
+
+        startAngle = endAngle;
+        endAngle = startAngle + sectorAngleArr[i];
+
+        var x1,x2,y1,y2 ;
+
+        x1 = parseInt(Math.round(200 + 195*Math.cos(Math.PI*startAngle/180)), 10);
+        y1 = parseInt(Math.round(200 + 195*Math.sin(Math.PI*startAngle/180)), 10);
+
+        x2 = parseInt(Math.round(200 + 195*Math.cos(Math.PI*endAngle/180)), 10);
+        y2 = parseInt(Math.round(200 + 195*Math.sin(Math.PI*endAngle/180)), 10);
+
+        var d = "M200,200  L" + x1 + "," + y1 + "  A195,195 0 " + 
+                ((endAngle-startAngle > 180) ? 1 : 0) + ",1 " + x2 + "," + y2 + " z";
+
+        var c = parseInt(i / sectorAngleArr.length * 360, 10);
+        arc = makeSVG("path", {class: "svgPie " + i, d: d, stroke: "#464852", fill: colorArray[i]});
+        paper.appendChild(arc);
+        //arc.onclick = clickHandler;
+    }
+}
+
+function drawPieChart() {     
+    $('#s path').remove();
+    $('#s circle').remove();
+    
+    var vals = [parseInt(testCounter.passed ,10), parseInt(testCounter.failed,10), parseInt(testCounter.notRelevant,10), parseInt(testCounter.notTested,10)];
+    var svgdoc = document.getElementById("s");
+    drawArcs(svgdoc, vals);
 }
 
 function expand() {
@@ -230,7 +406,7 @@ $(document).ready(function() {
             $(this).attr('class', 'arrow right');
         }
         
-        $(this).parent('.testMenuHeadline').next('.testMenuItem').slideToggle(150);
+        $(this).parents('.testMenuHeadlineBox').next('.testMenuItem').slideToggle(150);
     });
     
     $(document).on('click', '.polarion-ExecuteTest-buttons', function() {
@@ -270,6 +446,8 @@ $(document).ready(function() {
         }
         
         $('#testTotal th:nth-child(2)').html(testCounter.passed+testCounter.failed+testCounter.notRelevant+testCounter.notTested);
+        
+        drawPieChart();
 
         // average test time
         testTimeArray.push(new Date());
@@ -294,6 +472,10 @@ $(document).ready(function() {
         $('#testNotRelevant td:nth-child(2)').html('0');
         $('#testNotTested td:nth-child(2)').html('0');
         $('#testTotal th:nth-child(2)').html('0');
+        
+        testCounter = {passed: 0, failed: 0, notRelevant: 0, notTested: 0};
+        
+        drawPieChart();
     });
     
     $(document).on("click", ".GGAJDYPMKB-com-polarion-portal-js-viewers-querypanel-SearchQueryButton-CSSSearch-Css", function() {
@@ -335,9 +517,38 @@ $(document).ready(function() {
         $(selectedItem).attr('data-state', $(this).attr('data-state'));
     });
     
-    $(document).on("click", "#testAvTime", function() {
+    $(document).on("click", '#testAvTime', function() {
         testTimeArray = [];
          $('#testAvTime').html('Av. time: -');
+    });
+    
+    $(document).on("click", '.selectBox', function() {
+        $(this).next().toggle();
+    });
+
+    $(document).on("click", '.selectOption', function() {
+        var text = $(this).text();
+        var selectOptionBox = $(this).parent();
+        var selectBox = $(selectOptionBox).prev();
+        $(selectBox).children('.selectBoxText').html(text);
+        
+        $(selectOptionBox).find('.selectOption.selected').removeClass('selected');
+        $(this).addClass('selected');
+        
+        $(selectOptionBox).toggle();
+    });
+    
+    $(document).on("mouseenter mouseleave", '.svgPie', function() {
+        var lastClass = parseInt($(this).attr('class').split(' ').pop(), 10);
+        var idArray = ['#testPassed', '#testFailed', '#testNotRelevant', '#testNotTested'];
+        var textElment = $(idArray[lastClass]);
+
+        if($(textElment).css('font-weight') == '400') {
+            $(textElment).css('font-weight', 'bold');
+        }
+        else {
+            $(textElment).css('font-weight', '400');
+        }
     });
 });
 
@@ -363,12 +574,13 @@ function runScript() {
             + '#ExtraTestMenuButtonHide {border-spacing: 5px;} '
             + '#ExtraTestMenuButtonHide img, #ExtraTestMenuButtonHide div {vertical-align: middle;} '
             + '#ExtraTestMenuButtonHide:hover {cursor: pointer;} '
-    		+ '.testMenuHeadline {position: relative; width: 100%; height: 10px; display: inline-block; -webkit-user-select: none; -moz-user-select: none; user-select: none; margin: 5px 0;} '
+    		+ '.testMenuHeadlineBox {margin: 0 5px;} '
+    		+ '.testMenuHeadline {position: relative; width: 100%; height: 10px; display: inline-block; -webkit-user-select: none; -moz-user-select: none; user-select: none; margin: 3px 0; padding: 3px 0 0; border-top: 1px solid #929292;} '
     		+ '.testMenuHeadline:hover .arrow {cursor: pointer;} '
     		+ '.testMenuHeadline .arrow {width: 0; height: 0; float: left;} '
-    		+ '.testMenuHeadline .arrow.right {margin: 3px 8px; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 5px solid white;} '
-    		+ '.testMenuHeadline .arrow.down {margin: 5px 5px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 5px solid white;} '
-    		+ '.testMenuHeadlineText {position: absolute; top: 0; left: 22px;}'
+    		+ '.testMenuHeadline .arrow.right {margin: 3px 5px; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 5px solid white;} '
+    		+ '.testMenuHeadline .arrow.down {margin: 5px 2px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 5px solid white;} '
+    		+ '.testMenuHeadlineText {position: absolute; top: 3px; left: 20px;}'
             + '#ItemMarkPopup {display: none; position: absolute; width: 100px; top: 27px; left: 0; background-color: white; border-radius: 2px; border: 1px solid #dedede; -moz-box-shadow: 1px 1px 2px #e0dede; -webkit-box-shadow: 1px 1px 2px #e0dede; box-shadow: 1px 1px 2px #e0dede; font-size: 12px; overflow: auto; z-index: 5;} '
             + '#ItemMarkPopup table {font-weight: bold;} '
             + '.ItemMarkEl {display: table-cell; height: 20px; width: 90px; margin: 2px; vertical-align: middle;} '
@@ -383,11 +595,22 @@ function runScript() {
             + '#ItemMarkMenu {position:relative;} '
             + '#ItemMarkMenuButton:hover {border: 1px solid #cecece;-webkit-box-shadow: 0 0 2px #e0dede;box-shadow: 0 0 2px #e0dede;border-radius: 2px;} '
             + '#testCounter:hover {cursor: pointer;} '
-            + '#testCounter td, #testCounter th {padding: 0 5px; text-align: left;} '
+            + '#testCounter td, #testCounter th {padding: 0 5px; text-align: left; display: inline-block; width: 80px;} '
+    		+ '#testCounter tr {font-weight: 400;} '
             + '#MenuSeperate {-webkit-user-select: none; position: relative;} '
             + '#MenuSeperate hr {margin: 3px 0; width: 140px;} '
-            + '#AutoClickButton {width: 147px; margin: 2px; padding: 2px;} '
-            + '#TestCaseMessage {width: 149px; margin: 2px; padding: 2px;} ';
+            + '#TestCaseMessage {width: 149px; margin: 2px; padding: 2px;} '
+    		+ '.styledSelect {position: relative; width: 155px; margin: 2px; background-color: white; color: black;} '
+			+ '.styledSelect .selectOptionBox {font-weight: bold; display: none; position: absolute; z-index: 5; background-color: white; border-radius: 2px; border: 1px solid #dedede; -moz-box-shadow: 1px 1px 2px #e0dede; -webkit-box-shadow: 1px 1px 2px #e0dede; box-shadow: 1px 1px 2px #e0dede; padding: 5px;top: 22px; left: 0; width: 170px;} '
+    		+ '.styledSelect .selectOptionBox .selectOption {padding: 5px;} '
+			+ '.styledSelect .selectOptionBox .selectOption:hover {background-color: #fff68a; cursor: pointer;} '
+			+ '.styledSelect .selectBox {border: 1px solid #c9c9c9; height: 20px;} '
+    		+ '.styledSelect .selectBoxText {padding: 2px; display: block;} '
+    		+ '.selectBox .selectBoxArrow {float:right;} .selectBox .selectBoxArrow:hover {cursor: pointer;}  '
+    		+ '.arrowDown {width: 19px; height: 20px; background-image: url(/polarion/ria/images/combo_box_old.png);} '
+    		+ '#pieChart {display: inline-block; width: 100px; height: 75px; padding: 10px;}'
+			+ '.clearFloat {float: none;}';
+
     head.append('<style type="text/css">' + css + '</style>');
     
     // set an id for simple use later
@@ -406,26 +629,26 @@ function runScript() {
     						+ '<td><img src="/polarion/ria/images/portal/button_arrow_up.png"></td>'
     					+ '</tr>'
     				+ '</table>'
-    				+ '<div class="testMenuHeadline"><div class="arrow down"></div><div class="testMenuHeadlineText">Description</div></div>'
+    				+ '<div class="testMenuHeadlineBox"><div class="testMenuHeadline"><div class="arrow down"></div><div class="testMenuHeadlineText">Description</div></div></div>'
     				+ '<div class="testMenuItem">'
     				+ '<table style="width: 100%; border-spacing: 0;">'
     					+ '<tr id="ExpandDescription">'
     						+ '<td>'
     							+ '<div class="action">'
-    								+ '<div class="icon"><img src="/polarion/icons/default/topicIcons/documentsAndWiki.png" class="gwt-Image"></div>'
+    								+ '<div class="icon"><img src="data:image/png;base64,' + descriptionImage + '" class="gwt-Image"></div>'
     								+ '<div class="gwt-Label">Description (off)</div>'
     							+ '</div>'
     						+ '</td>'
     					+ '</tr>'
     				+ '</table>'
     				+ '</div>'
-    				+ '<div class="testMenuHeadline"><div class="arrow down"></div><div class="testMenuHeadlineText">AutoClick</div></div>'
+    				+ '<div class="testMenuHeadlineBox"><div class="testMenuHeadline"><div class="arrow down"></div><div class="testMenuHeadlineText">AutoClick</div></div></div>'
     				+ '<div class="testMenuItem">'
     				+ '<table style="width: 100%; border-spacing: 0;">'
     					+ '<tr id="AutoClick" data-state="off">'
     						+ '<td>'
     							+ '<div class="action">'
-    								+ '<div class="icon"><img src="/polarion/icons/default/topicIcons/Arrows_04-squiggle.png" class="gwt-Image"></div>'
+    								+ '<div class="icon"><img src="data:image/png;base64,' + autoClickImage + '" class="gwt-Image"></div>'
     								+ '<div class="gwt-Label">AutoClick (off)</div>'
     							+ '</div>'
     						+ '</td>'
@@ -434,15 +657,18 @@ function runScript() {
     				+ '<table style="width: 100%; padding: 4px;">'
                         + '<!--<tr><td><input id="AutoClickButton" type="text" placeholder="Buttontext"/></td></tr>-->'
     					+ '<tr><td>'
-    						+ '<select id="AutoClickButton">'
-    							+ '<option value="Passed" selected="True">Passed</option>'
-    							+ '<option value="Failed Always">Failed Always</option>'
-    							+ '<option value="Failed Often">Failed Often</option>'
-    							+ '<option value="Failed Several Times">Failed Several Times</option>'
-    							+ '<option value="Failed Once">Failed Once</option>'
-        						+ '<option value="Not Relevant">Not Relevant</option>'
-        						+ '<option value="Not Tested">Not Tested</option>'
-    						+ '</select>'
+    						+ '<div class="styledSelect">'
+                              	+ '<div class="selectBox"><span class="selectBoxArrow arrowDown"></span><span id="AutoClickButton" class="selectBoxText">Passed</span><div class="clearFloat"></div></div>'
+                                + '<div class="selectOptionBox">'
+                                    + '<div class="selectOption selected">Passed</div>'
+                                    + '<div class="selectOption">Failed Always</div>'
+                                    + '<div class="selectOption">Failed Often</div>'
+    								+ '<div class="selectOption">Failed Several Times</div>'
+    								+ '<div class="selectOption">Failed Once</div>'
+    								+ '<div class="selectOption">Not Relevant</div>'
+    								+ '<div class="selectOption">Not Tested</div>'
+                                + '</div>'
+                            + '</div>'
     					+ '</td></tr>'
                         + '<tr><td><textarea id="TestCaseMessage" placeholder="Test case comment"></textarea></td></tr>'
                         + '<tr><td>'
@@ -454,11 +680,11 @@ function runScript() {
                         + '</td></tr>'
     				+ '</table>'
     				+ '</div>'
-    				+ '<div class="testMenuHeadline"><div class="arrow right"></div><div class="testMenuHeadlineText">Statistics</div></div>'
+    				+ '<div class="testMenuHeadlineBox"><div class="testMenuHeadline"><div class="arrow right"></div><div class="testMenuHeadlineText">Statistics</div></div></div>'
     				+ '<div class="testMenuItem" style="display: none;">'
     				+ '<table style="width: 100%; padding: 4px;">'
                         + '<tr><td><div id="testAvTime">Av. time: -</div></td></tr>'
-    					+ '<tr><td id="MenuSeperate"><div class="polarion-SettingsSeparator" style="height: 1px; margin: 5px 0;"></div></td></tr>'
+    					+ '<tr><td id="MenuSeperate"><div class="polarion-SettingsSeparator" style="height: 1px; margin: 5px 6px;"></div></td></tr>'
     					+ '<tr><td><table id="testCounter">'
                             + '<tr id="testPassed"><td>Passed</td><td>0</td></tr>'
                             + '<tr id="testFailed"><td>Failed</td><td>0</td></tr>'
@@ -466,6 +692,13 @@ function runScript() {
                             + '<tr id="testNotTested"><td>Not tested</td><td>0</td></tr>'
     						+ '<tr id="testTotal"><th>Total</th><th>0</th></tr>'
     					+ '</table></td></tr>'
+    					+ '<tr><td>'
+    						+ '<div id="pieChart">'
+                                + '<svg width="100%" height="100%" id="s" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 400 400">'
+    								+ '<style type="text/css">path:hover, circle:hover {opacity: 0.8;}</style>'
+                                + '</svg>'
+                            + '</div>'
+    					+ '</td></tr>'
                     + '</table>'
     				+ '</div>';
     
@@ -479,7 +712,7 @@ function autoClick() {
         return;
     }
 
-    var AutoClickButton = $('#AutoClickButton').val();
+    var AutoClickButton = $('#AutoClickButton').text();
 
     if(!AutoClickButton) {
         AutoClickButton = 'Passed';
