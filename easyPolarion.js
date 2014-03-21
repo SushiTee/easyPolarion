@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       easyPolarion
 // @namespace  https://polarion.server
-// @version    0.1.11
+// @version    0.1.12
 // @description  Script to make the life with Polarion easier
 // @include    /^https?://polarion\.server.*/polarion/.*$/
 // @grant      none
@@ -596,6 +596,7 @@ function runScript() {
             + '#ItemMarkMenuButton:hover {border: 1px solid #cecece;-webkit-box-shadow: 0 0 2px #e0dede;box-shadow: 0 0 2px #e0dede;border-radius: 2px;} '
             + '#testCounter:hover {cursor: pointer;} '
             + '#testCounter td, #testCounter th {padding: 0 5px; text-align: left; display: inline-block; width: 80px;} '
+            + '#testCounter td:nth-child(2), #testCounter th:nth-child(2) {width: auto;} '
     		+ '#testCounter tr {font-weight: 400;} '
             + '#MenuSeperate {-webkit-user-select: none; position: relative;} '
             + '#MenuSeperate hr {margin: 3px 0; width: 140px;} '
