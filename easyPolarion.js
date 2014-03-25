@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       easyPolarion
 // @namespace  https://polarion.server
-// @version    0.1.12
+// @version    0.1.13
 // @description  Script to make the life with Polarion easier
 // @include    /^https?://polarion\.server.*/polarion/.*$/
 // @grant      none
@@ -157,6 +157,35 @@ var descriptionImage = 'iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMA
                         + 'Zri8vARjTNm2PXEcR5TL5RZd8v9L8hB2Op2kQbTbbbNcLhtpm+vr62Pf9zuu65J6vf4ewC8Ak61J'
                         + 'PZvNBACR0Va7BwcHXxuNxhsAQwAcAP4MADNoMpotm3/6AAAAAElFTkSuQmCC';
 
+function createCookie(name, value, days) {
+    var expires;
+
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toGMTString();
+    }
+    else {
+        expires = "";
+    }
+    document.cookie = escape(name) + "=" + escape(value) + expires + "; path=/";
+}
+
+function readCookie(name) {
+    var nameEQ = escape(name) + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) === 0) return unescape(c.substring(nameEQ.length, c.length));
+    }
+    return null;
+}
+
+function eraseCookie(name) {
+    createCookie(name, "", -1);
+}
+
 function addGlobalStyle(css) {
     var head = $('head');
     head.append('<style type="text/css">' + css + '</style>');
@@ -232,6 +261,89 @@ function drawPieChart() {
     drawArcs(svgdoc, vals);
 }
 
+function changeView(panelView, savedView) {
+    var topBarArrow = $('.polarion-BubblePanel-InputField').closest('.GGAJDYPHKB-com-polarion-portal-js-viewers-querypanel-AbstractQueryPanel-CSS-CellFree').parent().closest('td').parent('tr').children('td:last').find('td:last');
+    var headlineElement = $('#_ui_tree_table_header');
+    var position;
+    var panelViewText;
+    if(panelView == 'horizontal') {
+        panelViewText = 'Tile Panes Horizontally';
+    }
+    else {
+        panelViewText = 'Tile Panes Vertically';
+    }
+
+    $(topBarArrow).click();
+    
+    var runCount = 0;
+    waitForButton();
+    
+    function waitForButton() {
+        var buttonElement = $('.GGAJDYPB-B-com-polarion-reina-web-js-widgets-menu-ContextMenuItem-CSS-Content:contains("' + panelViewText + '")');
+        
+        if(!buttonElement || buttonElement.length <= 0) {
+            if(runCount >= 10) {
+                return;
+            }
+            
+            runCount++;
+            window.setTimeout(waitForButton,20);
+        }
+        else {
+            $(buttonElement).click();
+            
+            var iFrameElement = $('.GGAJDYPGNB-com-polarion-reina-web-js-widgets-HTMLPopupContainer-CSS-WorkaroundFrameCss');
+            if(iFrameElement.length) {
+                $(topBarArrow).click();
+            }
+            
+            position = $('#_ui_tree_table_header').offset();
+            $(document.elementFromPoint(position.left+2, position.top+2)).trigger({type:'contextmenu'});
+            
+            runCount = 0;
+            waitForHeadline();
+        }
+    }
+    
+    function waitForHeadline() {
+        var menuElement = $('.GGAJDYPL-B-com-polarion-reina-web-js-widgets-menu-ContextSubMenu-CSS-Css');
+        
+        if(!menuElement || menuElement.length <= 0) {
+            if(runCount >= 10) {
+                return;
+            }
+            
+            runCount++;
+            window.setTimeout(waitForHeadline,20);
+        }
+        else {
+            $(menuElement).css({'left': (position.left+2) + 'px', 'top': (position.top+2) + 'px'});
+            $(menuElement).find('tr:first').children('td:nth-child(2)').trigger('mouseover');
+            
+            runCount = 0;
+            waitForView();
+        }
+    }
+    
+    function waitForView() {
+        var menuElement = $('.GGAJDYPL-B-com-polarion-reina-web-js-widgets-menu-ContextSubMenu-CSS-Css:last');
+        
+        if(!menuElement || menuElement.length <= 0) {
+            if(runCount >= 10) {
+                return;
+            }
+            
+            runCount++;
+            window.setTimeout(waitForHeadline,20);
+        }
+        else {
+            $(menuElement).find('td:contains("' + savedView + '")').click();
+            
+            $('.GGAJDYPL-B-com-polarion-reina-web-js-widgets-menu-ContextSubMenu-CSS-Css').remove();
+            $('.GGAJDYPGNB-com-polarion-reina-web-js-widgets-HTMLPopupContainer-CSS-WorkaroundFrameCss').remove();
+        }
+    }
+}
 function expand() {
     if(expanded == 0) {
         addGlobalStyle('.JSTreeTableRow .fixed .content { white-space: normal !important; height: auto !important; } .JSTreeTableRow .fixed { height: auto !important; }');
@@ -389,6 +501,14 @@ $(document).ready(function() {
         }
     });
     
+    $(document).on("click", "#DefectView", function() {
+		changeView('horizontal', 'Defect (Repository)');
+    });
+    
+    $(document).on("click", "#TestrunView", function() {
+		changeView('vertical', 'Testrun (Repository)');
+    });
+    
     $(document).on("click", "#ExtraTestMenuButtonShow", function() {
         toggleMenu();
     });
@@ -399,14 +519,20 @@ $(document).ready(function() {
     
     $(document).on("click", ".arrow", function() {
         var classAttr = $(this).attr('class');
+        var headLineBox = $(this).parents('.testMenuHeadlineBox');
         if(classAttr == 'arrow right') {
             $(this).attr('class', 'arrow down');
+            
+            // store information in a cookie
+            createCookie('extraMenu_' + $(headLineBox).text(), '1', 2); // 1 = open
         }
         else {
             $(this).attr('class', 'arrow right');
+            
+            createCookie('extraMenu_' + $(headLineBox).text(), '0', 2); // 0 = closed
         }
         
-        $(this).parents('.testMenuHeadlineBox').next('.testMenuItem').slideToggle(150);
+        $(headLineBox).next('.testMenuItem').slideToggle(150);
     });
     
     $(document).on('click', '.polarion-ExecuteTest-buttons', function() {
@@ -538,17 +664,20 @@ $(document).ready(function() {
         $(selectOptionBox).toggle();
     });
     
-    $(document).on("mouseenter mouseleave", '.svgPie', function() {
+    $(document).on("mouseenter", '.svgPie', function() {
         var lastClass = parseInt($(this).attr('class').split(' ').pop(), 10);
         var idArray = ['#testPassed', '#testFailed', '#testNotRelevant', '#testNotTested'];
         var textElment = $(idArray[lastClass]);
 
-        if($(textElment).css('font-weight') == '400') {
-            $(textElment).css('font-weight', 'bold');
-        }
-        else {
-            $(textElment).css('font-weight', '400');
-        }
+        $(textElment).css('font-weight', 'bold');
+    });
+    
+    $(document).on("mouseleave", '.svgPie', function() {
+        var lastClass = parseInt($(this).attr('class').split(' ').pop(), 10);
+        var idArray = ['#testPassed', '#testFailed', '#testNotRelevant', '#testNotTested'];
+        var textElment = $(idArray[lastClass]);
+
+        $(textElment).css('font-weight', '400');
     });
 });
 
@@ -574,6 +703,8 @@ function runScript() {
             + '#ExtraTestMenuButtonHide {border-spacing: 5px;} '
             + '#ExtraTestMenuButtonHide img, #ExtraTestMenuButtonHide div {vertical-align: middle;} '
             + '#ExtraTestMenuButtonHide:hover {cursor: pointer;} '
+    		+ '.testMenuItem tr {display: block; margin-left: 10px;} '
+    		+ '.testMenuItem .noBlock {display: table-row; margin-left: 0px;} '
     		+ '.testMenuHeadlineBox {margin: 0 5px;} '
     		+ '.testMenuHeadline {position: relative; width: 100%; height: 10px; display: inline-block; -webkit-user-select: none; -moz-user-select: none; user-select: none; margin: 3px 0; padding: 3px 0 0; border-top: 1px solid #929292;} '
     		+ '.testMenuHeadline:hover .arrow {cursor: pointer;} '
@@ -597,7 +728,7 @@ function runScript() {
             + '#testCounter:hover {cursor: pointer;} '
             + '#testCounter td, #testCounter th {padding: 0 5px; text-align: left; display: inline-block; width: 80px;} '
             + '#testCounter td:nth-child(2), #testCounter th:nth-child(2) {width: auto;} '
-    		+ '#testCounter tr {font-weight: 400;} '
+    		+ '#testCounter tr {margin-left: 0; font-weight: 400;} '
             + '#MenuSeperate {-webkit-user-select: none; position: relative;} '
             + '#MenuSeperate hr {margin: 3px 0; width: 140px;} '
             + '#TestCaseMessage {width: 149px; margin: 2px; padding: 2px;} '
@@ -623,6 +754,20 @@ function runScript() {
     }
     tbody.children('tr').append('<td><div id="ExtraTestMenuButtonShow"></div></td>');
     
+    var testMenuItemDisplays = {Description: {display: '', arrow: 'down'}, AutoClick: {display: '', arrow: 'down'}, View: {display: ' style="display: none;"', arrow: 'right'}, Statistics: {display: ' style="display: none;"', arrow: 'right'}};
+    var testMenuItemDisplaykeys = Object.keys(testMenuItemDisplays); 
+    for(var i = 0; i < testMenuItemDisplaykeys.length; i++) {
+        var key = testMenuItemDisplaykeys[i];
+        if(readCookie('extraMenu_' + key) == '0') {
+            testMenuItemDisplays[key].display = ' style="display: none;"';
+            testMenuItemDisplays[key].arrow = 'right';
+        }
+        else if(readCookie('extraMenu_' + key) == '1') {
+            testMenuItemDisplays[key].display = '';
+            testMenuItemDisplays[key].arrow = 'down';
+        }
+    }
+
     var menuHtml = '<table id="ExtraTestMenuButtonHide">'
     					+ '<tr>'
     						+ '<td><img src="/polarion/ria/images/portal/settings_on.png"></td>'
@@ -630,10 +775,10 @@ function runScript() {
     						+ '<td><img src="/polarion/ria/images/portal/button_arrow_up.png"></td>'
     					+ '</tr>'
     				+ '</table>'
-    				+ '<div class="testMenuHeadlineBox"><div class="testMenuHeadline"><div class="arrow down"></div><div class="testMenuHeadlineText">Description</div></div></div>'
-    				+ '<div class="testMenuItem">'
+    				+ '<div class="testMenuHeadlineBox"><div class="testMenuHeadline"><div class="arrow ' + testMenuItemDisplays.Description.arrow + '"></div><div class="testMenuHeadlineText">Description</div></div></div>'
+    				+ '<div class="testMenuItem"' + testMenuItemDisplays.Description.display + '>'
     				+ '<table style="width: 100%; border-spacing: 0;">'
-    					+ '<tr id="ExpandDescription">'
+    					+ '<tr class="noBlock" id="ExpandDescription">'
     						+ '<td>'
     							+ '<div class="action">'
     								+ '<div class="icon"><img src="data:image/png;base64,' + descriptionImage + '" class="gwt-Image"></div>'
@@ -643,10 +788,10 @@ function runScript() {
     					+ '</tr>'
     				+ '</table>'
     				+ '</div>'
-    				+ '<div class="testMenuHeadlineBox"><div class="testMenuHeadline"><div class="arrow down"></div><div class="testMenuHeadlineText">AutoClick</div></div></div>'
-    				+ '<div class="testMenuItem">'
+    				+ '<div class="testMenuHeadlineBox"><div class="testMenuHeadline"><div class="arrow ' + testMenuItemDisplays.AutoClick.arrow + '"></div><div class="testMenuHeadlineText">AutoClick</div></div></div>'
+    				+ '<div class="testMenuItem"' + testMenuItemDisplays.AutoClick.display + '>'
     				+ '<table style="width: 100%; border-spacing: 0;">'
-    					+ '<tr id="AutoClick" data-state="off">'
+    					+ '<tr class="noBlock" id="AutoClick" data-state="off">'
     						+ '<td>'
     							+ '<div class="action">'
     								+ '<div class="icon"><img src="data:image/png;base64,' + autoClickImage + '" class="gwt-Image"></div>'
@@ -681,12 +826,33 @@ function runScript() {
                         + '</td></tr>'
     				+ '</table>'
     				+ '</div>'
-    				+ '<div class="testMenuHeadlineBox"><div class="testMenuHeadline"><div class="arrow right"></div><div class="testMenuHeadlineText">Statistics</div></div></div>'
-    				+ '<div class="testMenuItem" style="display: none;">'
+    				+ '<div class="testMenuHeadlineBox"><div class="testMenuHeadline"><div class="arrow ' + testMenuItemDisplays.View.arrow + '"></div><div class="testMenuHeadlineText">View</div></div></div>'
+    				+ '<div class="testMenuItem"' + testMenuItemDisplays.View.display + '>'
+    				+ '<table style="width: 100%; border-spacing: 0;">'
+    					+ '<tr class="noBlock" id="DefectView">'
+    						+ '<td>'
+    							+ '<div class="action">'
+    								+ '<div class="icon"><img src="data:image/png;base64,' + descriptionImage + '" class="gwt-Image"></div>'
+    								+ '<div class="gwt-Label">Defect View</div>'
+    							+ '</div>'
+    						+ '</td>'
+    					+ '</tr>'
+    					+ '<tr class="noBlock" id="TestrunView">'
+    						+ '<td>'
+    							+ '<div class="action">'
+    								+ '<div class="icon"><img src="data:image/png;base64,' + descriptionImage + '" class="gwt-Image"></div>'
+    								+ '<div class="gwt-Label">Testrun View</div>'
+    							+ '</div>'
+    						+ '</td>'
+    					+ '</tr>'
+    				+ '</table>'
+    				+ '</div>'
+    				+ '<div class="testMenuHeadlineBox"><div class="testMenuHeadline"><div class="arrow ' + testMenuItemDisplays.Statistics.arrow + '"></div><div class="testMenuHeadlineText">Statistics</div></div></div>'
+    				+ '<div class="testMenuItem"' + testMenuItemDisplays.Statistics.display + '>'
     				+ '<table style="width: 100%; padding: 4px;">'
                         + '<tr><td><div id="testAvTime">Av. time: -</div></td></tr>'
-    					+ '<tr><td id="MenuSeperate"><div class="polarion-SettingsSeparator" style="height: 1px; margin: 5px 6px;"></div></td></tr>'
-    					+ '<tr><td><table id="testCounter">'
+    					+ '<tr class="noBlock"><td id="MenuSeperate"><div class="polarion-SettingsSeparator" style="height: 1px; margin: 5px 6px 5px 15px;"></div></td></tr>'
+    					+ '<tr><td><table id="testCounter" style="border-spacing: 0;">'
                             + '<tr id="testPassed"><td>Passed</td><td>0</td></tr>'
                             + '<tr id="testFailed"><td>Failed</td><td>0</td></tr>'
                             + '<tr id="testNotRelevant"><td>Not relevant</td><td>0</td></tr>'
