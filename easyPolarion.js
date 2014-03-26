@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       easyPolarion
 // @namespace  https://polarion.server
-// @version    0.1.13
+// @version    0.1.14
 // @description  Script to make the life with Polarion easier
 // @include    /^https?://polarion\.server.*/polarion/.*$/
 // @grant      none
@@ -21,6 +21,7 @@ var testTimeArray = [];
 var searchLineText = '';
 var testCounter = {passed: 0, failed: 0, notRelevant: 0, notTested: 0};
 var messageActive = false;
+var viewObjects = [];
 var menuImage = 'iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAATbSURBVEhLnVZp'
                 + 'SGVlGLaIaWomyJiiEJKiX0VENUQwTM2PgqE0Cfd9H1fcNfd96bqTy83UKS2vSwajMiriknKVUUljwhm9EKLmAuJ2cct77/l6nsNcu26MJXycc+75vud53vd93vdoZnaOv'
                 + '7i4uLCgoKDf3dzcHrq4uDz08fHxOsexk1va29ufLS4ufi8vL8/c9G10dPS34eHhwsvLS3h7e4vq6ur7W1tb7sY9eH6hrKzsbaVSaXEmcVpa2huRkZHRYWFhP8XGxqYWFR'
@@ -156,6 +157,15 @@ var descriptionImage = 'iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMA
                         + 'iiIwxqCUwtnZ2cdms/ndcZzeVudxXMOEkET6+NnzPEgpv+zv738A8GphSAwGgwfZlwdSyiSL05jN'
                         + 'Zri8vARjTNm2PXEcR5TL5RZd8v9L8hB2Op2kQbTbbbNcLhtpm+vr62Pf9zuu65J6vf4ewC8Ak61J'
                         + 'PZvNBACR0Va7BwcHXxuNxhsAQwAcAP4MADNoMpotm3/6AAAAAElFTkSuQmCC';
+var editImage = "<svg xml:space='preserve' enable-background='new 0 0 512 512' viewBox='0 0 512 512' y='0px' x='0px' xmlns:xlink='http://www.w3.org/1999/xlink' "
+				+ "xmlns='http://www.w3.org/2000/svg' version='1.1'><path fill='white' id='pencil-10-icon' d='M172.782,438.836L172.782,438.836L50.417,461.42l24.686-120.264l0.001-0.001L172.782,438.836z "
+				+ "M364.735,51.523l-43.829,43.829l97.682,97.68l43.829-43.829L364.735,51.523z M96.996,319.263l97.681,97.679l202.017-202.015 l-97.68-97.682L96.996,319.263z'/></svg>";
+var addImage = "<svg xml:space='preserve' enable-background='new 0 0 512 512' viewBox='0 0 512 512' y='0px' x='0px' width='auto' height='auto' xmlns:xlink='http://www.w3.org/1999/xlink' "
+				+ "xmlns='http://www.w3.org/2000/svg' version='1.1'><polygon fill='green' id='plus-icon' points='462,198.615 313.385,198.615 313.385,50 198.615,50 198.615,198.615 50,198.615 "
+				+ "50,313.385 198.615,313.385 198.615,462 313.385,462 313.385,313.385 462,313.385'/></svg>";
+var deleteImage = "<svg xml:space='preserve' enable-background='new 0 0 512 512' viewBox='0 0 512 512' y='0px' x='0px' xmlns:xlink='http://www.w3.org/1999/xlink' "
+				+ "xmlns='http://www.w3.org/2000/svg' version='1.1'><polygon fill='red' id='x-mark-icon' points='438.393,374.595 319.757,255.977 438.378,137.348 374.595,73.607 "
+				+ "255.995,192.225 137.375,73.622 73.607,137.352 192.246,255.983 73.622,374.625 137.352,438.393 256.002,319.734 374.652,438.378'/></svg>"
 
 function createCookie(name, value, days) {
     var expires;
@@ -266,7 +276,7 @@ function changeView(panelView, savedView) {
     var headlineElement = $('#_ui_tree_table_header');
     var position;
     var panelViewText;
-    if(panelView == 'horizontal') {
+    if(panelView == 'Horizontal') {
         panelViewText = 'Tile Panes Horizontally';
     }
     else {
@@ -344,6 +354,93 @@ function changeView(panelView, savedView) {
         }
     }
 }
+
+function getViews(callback) {
+    var tableHeader = $('#_ui_tree_table_header');
+    if(!tableHeader.length) {
+        callback([]);
+    	return;
+    }
+    
+    var position = $(tableHeader).offset();
+    $(document.elementFromPoint(position.left+2, position.top+2)).trigger({type:'contextmenu'});
+    
+    var runCount = 0;
+    waitForHeadline();
+
+	function waitForHeadline() {
+        var menuElement = $('.GGAJDYPL-B-com-polarion-reina-web-js-widgets-menu-ContextSubMenu-CSS-Css');
+        
+        if(!menuElement || menuElement.length <= 0) {
+            if(runCount >= 10) {
+                callback([]);
+                return;
+            }
+            
+            runCount++;
+            window.setTimeout(waitForHeadline,20);
+        }
+        else {
+            $(menuElement).css({'left': (position.left+2) + 'px', 'top': (position.top+2) + 'px'});
+            $(menuElement).find('tr:first').children('td:nth-child(2)').trigger('mouseover');
+            
+            runCount = 0;
+            waitForView();
+        }
+    }
+    
+    function waitForView() {
+        var menuElement = $('.GGAJDYPL-B-com-polarion-reina-web-js-widgets-menu-ContextSubMenu-CSS-Css:last');
+        
+        if(!menuElement || menuElement.length <= 0) {
+            if(runCount >= 10) {
+                callback([]);
+                return;
+            }
+            
+            runCount++;
+            window.setTimeout(waitForHeadline,20);
+        }
+        else {
+            var retVal = [];
+            $(menuElement).find('td.GGAJDYPB-B-com-polarion-reina-web-js-widgets-menu-ContextMenuItem-CSS-Content').not(':last').each(function(index) {
+            	retVal.push($(this).text());
+            });
+            
+            $('.GGAJDYPL-B-com-polarion-reina-web-js-widgets-menu-ContextSubMenu-CSS-Css').remove();
+            $('.GGAJDYPGNB-com-polarion-reina-web-js-widgets-HTMLPopupContainer-CSS-WorkaroundFrameCss').remove();
+            callback(retVal);
+        }
+    }
+}
+
+function drawViews() {
+    var viewTableHTML = '';
+    var viewDropDown = '';
+    for(var i = 0; i < viewObjects.length; i++) {
+        var viewObject = viewObjects[i];
+        viewTableHTML += '<tr class="noBlock" data-panes="' + viewObject.panes + '" data-name="' + viewObject.name + '">'
+        					+ '<td>'
+    							+ '<div class="action">'
+    								+ '<div class="icon"><img src="data:image/png;base64,' + descriptionImage + '" class="gwt-Image"></div>'
+    								+ '<div class="gwt-Label">' + viewObject.name + '</div>'
+    							+ '</div>'
+    						+ '</td>'
+    					+ '</tr>';
+        if(i == 0) {
+        	viewDropDown += '<div class="selectOption selected">' + viewObject.name + '</div>';
+        }
+        else {
+        	viewDropDown += '<div class="selectOption">' + viewObject.name + '</div>';
+        }
+    }
+    $('#viewTable').html(viewTableHTML);
+    $('#activatedViewOptions').html(viewDropDown);
+    if(viewDropDown.length > 0) {
+    	$('#activatedViewOptions').parent('.styledSelect').find('.selectBoxText').html(viewObjects[0].name);
+    }
+}
+
 function expand() {
     if(expanded == 0) {
         addGlobalStyle('.JSTreeTableRow .fixed .content { white-space: normal !important; height: auto !important; } .JSTreeTableRow .fixed { height: auto !important; }');
@@ -501,14 +598,6 @@ $(document).ready(function() {
         }
     });
     
-    $(document).on("click", "#DefectView", function() {
-		changeView('horizontal', 'Defect (Repository)');
-    });
-    
-    $(document).on("click", "#TestrunView", function() {
-		changeView('vertical', 'Testrun (Repository)');
-    });
-    
     $(document).on("click", "#ExtraTestMenuButtonShow", function() {
         toggleMenu();
     });
@@ -520,16 +609,18 @@ $(document).ready(function() {
     $(document).on("click", ".arrow", function() {
         var classAttr = $(this).attr('class');
         var headLineBox = $(this).parents('.testMenuHeadlineBox');
+        
         if(classAttr == 'arrow right') {
             $(this).attr('class', 'arrow down');
             
             // store information in a cookie
-            createCookie('extraMenu_' + $(headLineBox).text(), '1', 2); // 1 = open
+            createCookie('extraMenu_' + $(headLineBox).find('.testMenuHeadlineText').text(), '1', 2); // 1 = open
         }
         else {
             $(this).attr('class', 'arrow right');
-            
-            createCookie('extraMenu_' + $(headLineBox).text(), '0', 2); // 0 = closed
+
+            // store information in a cookie
+            createCookie('extraMenu_' + $(headLineBox).find('.testMenuHeadlineText').text(), '0', 2); // 0 = closed
         }
         
         $(headLineBox).next('.testMenuItem').slideToggle(150);
@@ -679,6 +770,71 @@ $(document).ready(function() {
 
         $(textElment).css('font-weight', '400');
     });
+    
+    $(document).on("click", '#editView.epIcon', function() {
+        var editViewBox = $('#editViewBox');
+        $(editViewBox).toggle();
+        
+        if($(editViewBox).css('display') != 'none') {
+            getViews(function(availableViews) {
+                var optionsHTML = '';
+                for(var i in availableViews) {
+                    if(i == 0) {
+                        optionsHTML += '<div class="selectOption selected">' + availableViews[i] + '</div>'
+                    }
+                    else {
+                        optionsHTML += '<div class="selectOption">' + availableViews[i] + '</div>'
+                    }
+                }
+                var viewOptions = $('#availableViewOptions');
+                $(viewOptions).html('');
+                $(viewOptions).append(optionsHTML);
+            });
+        }
+    });
+    
+    $(document).on("click", '#editViewAdd', function() {
+        var viewObject = {panes: $('#availableViewPanes').prev('.selectBox').text(), name: $('#availableViewOptions').prev('.selectBox').text()};
+        
+        for(var i = 0; i < viewObjects.length; i++) {
+            if(viewObjects[i].name == viewObject.name) {
+                return;
+            }
+        }
+
+        viewObjects.push(viewObject);
+
+        createCookie('extraMenu_Views', JSON.stringify(viewObjects), 14);
+        
+        $('#editViewBox').toggle();
+        
+        drawViews();
+    });
+    
+    $(document).on("click", '#viewTable .noBlock', function() {
+        changeView($(this).attr('data-panes'), $(this).attr('data-name'));
+    });
+    
+    $(document).on("click", '#editViewDelete', function() {
+        var viewName = $('#activatedViewOptions').prev('.selectBox').text();
+        
+        var viewID = -1;
+        for(var i = 0; i < viewObjects.length; i++) {
+            if(viewObjects[i].name == viewName) {
+                viewID = i;
+            }
+        }
+
+        if(viewID > -1) {
+            viewObjects.splice(viewID, 1);
+    
+            createCookie('extraMenu_Views', JSON.stringify(viewObjects), 1);
+            
+            drawViews();
+        }
+        
+        $('#editViewBox').toggle();
+    });
 });
 
 function mainLoop() {
@@ -740,8 +896,15 @@ function runScript() {
     		+ '.styledSelect .selectBoxText {padding: 2px; display: block;} '
     		+ '.selectBox .selectBoxArrow {float:right;} .selectBox .selectBoxArrow:hover {cursor: pointer;}  '
     		+ '.arrowDown {width: 19px; height: 20px; background-image: url(/polarion/ria/images/combo_box_old.png);} '
-    		+ '#pieChart {display: inline-block; width: 100px; height: 75px; padding: 10px;}'
-			+ '.clearFloat {float: none;}';
+    		+ '#pieChart {display: inline-block; width: 100px; height: 75px; padding: 10px;} '
+    		+ '.epIcon {width: 15px; height: 15px;} .epIcon:hover {cursor: pointer;}'
+			+ '.epIcon.deleteButton {background-image: url("data:image/svg+xml;utf8,' + deleteImage + '");} '
+			+ '.epIcon.addButton {background-image: url("data:image/svg+xml;utf8,' + addImage + '");} '
+			+ '.epIcon.editButton {background-image: url("data:image/svg+xml;utf8,' + editImage + '");} '
+    		+ '.epIcon.epRight {float: right;} '
+    		+ '#editViewBox {display: none; position: absolute; top: 20px; right: 0; width: 180px; z-index: 5; background-color: white; border-radius: 2px; border: 1px solid #dedede; -moz-box-shadow: 1px 1px 2px #e0dede; -webkit-box-shadow: 1px 1px 2px #e0dede; box-shadow: 1px 1px 2px #e0dede; padding: 5px;} '
+			+ '#editViewBox .epIcon {margin-top: 5px;} '
+   			+ '.clearFloat {float: none;}';
 
     head.append('<style type="text/css">' + css + '</style>');
     
@@ -766,6 +929,14 @@ function runScript() {
             testMenuItemDisplays[key].display = '';
             testMenuItemDisplays[key].arrow = 'down';
         }
+    }
+    
+    var viewObjectsCookie = readCookie('extraMenu_Views');
+    if(viewObjectsCookie != null) {
+    	viewObjects = JSON.parse(viewObjectsCookie);
+        
+        // refresh cookie
+        createCookie('extraMenu_Views', JSON.stringify(viewObjects), 14);
     }
 
     var menuHtml = '<table id="ExtraTestMenuButtonHide">'
@@ -826,25 +997,31 @@ function runScript() {
                         + '</td></tr>'
     				+ '</table>'
     				+ '</div>'
-    				+ '<div class="testMenuHeadlineBox"><div class="testMenuHeadline"><div class="arrow ' + testMenuItemDisplays.View.arrow + '"></div><div class="testMenuHeadlineText">View</div></div></div>'
+    				+ '<div class="testMenuHeadlineBox"><div class="testMenuHeadline">'
+    					+ '<div id="editView" class="epIcon editButton epRight"></div><div class="clearFloat"></div>'
+    					+ '<div id="editViewBox">'
+    						+ '<div class="styledSelect">'
+                                + '<div class="selectBox"><span class="selectBoxArrow arrowDown"></span><span class="selectBoxText">Vertical</span></div>'
+                                + '<div id="availableViewPanes" class="selectOptionBox">'
+    								+ '<div class="selectOption selected">Vertical</div>'
+    								+ '<div class="selectOption selected">Horizontal</div>'
+    							+ '</div>'
+                            + '</div>'
+    						+ '<div id="editViewAdd" class="epIcon addButton epRight"></div>'
+                            + '<div class="styledSelect">'
+                                + '<div class="selectBox"><span class="selectBoxArrow arrowDown"></span><span class="selectBoxText">Default</span><div class="clearFloat"></div></div>'
+                                + '<div id="availableViewOptions" class="selectOptionBox"></div>'
+                            + '</div>'
+    						+ '<div id="editViewDelete" class="epIcon deleteButton epRight"></div>'
+    						+ '<div class="styledSelect">'
+                                + '<div class="selectBox"><span class="selectBoxArrow arrowDown"></span><span class="selectBoxText"></span><div class="clearFloat"></div></div>'
+                                + '<div id="activatedViewOptions" class="selectOptionBox">'
+    							+ '</div>'
+                            + '</div>'
+    					+ '</div>'
+    					+ '<div class="arrow ' + testMenuItemDisplays.View.arrow + '"></div><div class="testMenuHeadlineText">View</div><div class="clearFloat"></div></div></div>'
     				+ '<div class="testMenuItem"' + testMenuItemDisplays.View.display + '>'
-    				+ '<table style="width: 100%; border-spacing: 0;">'
-    					+ '<tr class="noBlock" id="DefectView">'
-    						+ '<td>'
-    							+ '<div class="action">'
-    								+ '<div class="icon"><img src="data:image/png;base64,' + descriptionImage + '" class="gwt-Image"></div>'
-    								+ '<div class="gwt-Label">Defect View</div>'
-    							+ '</div>'
-    						+ '</td>'
-    					+ '</tr>'
-    					+ '<tr class="noBlock" id="TestrunView">'
-    						+ '<td>'
-    							+ '<div class="action">'
-    								+ '<div class="icon"><img src="data:image/png;base64,' + descriptionImage + '" class="gwt-Image"></div>'
-    								+ '<div class="gwt-Label">Testrun View</div>'
-    							+ '</div>'
-    						+ '</td>'
-    					+ '</tr>'
+    				+ '<table id="viewTable" style="width: 100%; border-spacing: 0;">'
     				+ '</table>'
     				+ '</div>'
     				+ '<div class="testMenuHeadlineBox"><div class="testMenuHeadline"><div class="arrow ' + testMenuItemDisplays.Statistics.arrow + '"></div><div class="testMenuHeadlineText">Statistics</div></div></div>'
@@ -872,6 +1049,8 @@ function runScript() {
     //var menu = $('#ExtraTestMenu');
     var menu = $('#navigationPanel');
     $(menu).append('<div id="ExtraTestMenu" class="polarion-SettingsPanel">' + menuHtml + '</div>');
+    
+    drawViews();
 }
 
 function autoClick() {
