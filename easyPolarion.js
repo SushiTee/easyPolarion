@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       easyPolarion
 // @namespace  https://polarion.server
-// @version    0.1.14
+// @version    0.1.15
 // @description  Script to make the life with Polarion easier
 // @include    /^https?://polarion\.server.*/polarion/.*$/
 // @grant      none
@@ -157,6 +157,16 @@ var descriptionImage = 'iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMA
                         + 'iiIwxqCUwtnZ2cdms/ndcZzeVudxXMOEkET6+NnzPEgpv+zv738A8GphSAwGgwfZlwdSyiSL05jN'
                         + 'Zri8vARjTNm2PXEcR5TL5RZd8v9L8hB2Op2kQbTbbbNcLhtpm+vr62Pf9zuu65J6vf4ewC8Ak61J'
                         + 'PZvNBACR0Va7BwcHXxuNxhsAQwAcAP4MADNoMpotm3/6AAAAAElFTkSuQmCC';
+var horizontalImage = 'iVBORw0KGgoAAAANSUhEUgAAAB4AAAAZCAIAAACpVwlNAAAACXBIWXMAABcRAAAXEQHKJvM/AAAA'
+                    + 'yElEQVR4nO3VMQqEMBAF0MyioE4jopV9zpDTiQfwVnoBK3trC5sRJZjZImFB2HJ2YRd/9dM8fjEQ'
+                    + 'WNcVEZV0nHNRHMfW2mmaBF2tNSIqIhrHUdBVSvV975yL/AMRm6YRcdu2Dc2vrqqKhVIUhV/9EFn6'
+                    + 'Njf9F3S4a2Y+jkNEZOYLvSxLkiQi9CuBLstynmcRsa7rCw0AaZqK0ADgy29eyE1/jw7Ht21b13Ui'
+                    + '4r7voX3ubwQiOs9zGAZB2hiT5zkQUZZlgq4PMz8B5G2cuczdlbsAAAAASUVORK5CYII=';
+var verticalImage = 'iVBORw0KGgoAAAANSUhEUgAAAB4AAAAZCAIAAACpVwlNAAAACXBIWXMAABcRAAAXEQHKJvM/AAAA'
+                    + 'sUlEQVR4nO2VMQqFMAyGk4dOBaEBx27eoODxxAN4gIL3EI9gL+AdXEqn0kGog+Vtrw6vbv2mBP58'
+                    + 'JFPwOA4igheo6ro+z3Pf94zSruuapgFjTF4vAKzrGkKo7oYxNgxDekBrjYh936dj4zjG6t66bdvw'
+                    + 'hFJqnufHGBHdW3/+Pf43RV3URV3URZ2R+GWcc9M0paPbtiGitTYd897H6t3fKIRYliWjWkoJAGiM'
+                    + '4Zxn9H65AP82hyFzy2/WAAAAAElFTkSuQmCC';
 var editImage = "<svg xml:space='preserve' enable-background='new 0 0 512 512' viewBox='0 0 512 512' y='0px' x='0px' xmlns:xlink='http://www.w3.org/1999/xlink' "
 				+ "xmlns='http://www.w3.org/2000/svg' version='1.1'><path fill='white' id='pencil-10-icon' d='M172.782,438.836L172.782,438.836L50.417,461.42l24.686-120.264l0.001-0.001L172.782,438.836z "
 				+ "M364.735,51.523l-43.829,43.829l97.682,97.68l43.829-43.829L364.735,51.523z M96.996,319.263l97.681,97.679l202.017-202.015 l-97.68-97.682L96.996,319.263z'/></svg>";
@@ -419,10 +429,14 @@ function drawViews() {
     var viewDropDown = '';
     for(var i = 0; i < viewObjects.length; i++) {
         var viewObject = viewObjects[i];
+        var image = verticalImage;
+        if(viewObject.panes == 'Horizontal') {
+        	image = horizontalImage;
+        }
         viewTableHTML += '<tr class="noBlock" data-panes="' + viewObject.panes + '" data-name="' + viewObject.name + '">'
         					+ '<td>'
     							+ '<div class="action">'
-    								+ '<div class="icon"><img src="data:image/png;base64,' + descriptionImage + '" class="gwt-Image"></div>'
+    								+ '<div class="icon"><img src="data:image/png;base64,' + image + '" class="gwt-Image"></div>'
     								+ '<div class="gwt-Label">' + viewObject.name + '</div>'
     							+ '</div>'
     						+ '</td>'
@@ -902,8 +916,11 @@ function runScript() {
 			+ '.epIcon.addButton {background-image: url("data:image/svg+xml;utf8,' + addImage + '");} '
 			+ '.epIcon.editButton {background-image: url("data:image/svg+xml;utf8,' + editImage + '");} '
     		+ '.epIcon.epRight {float: right;} '
-    		+ '#editViewBox {display: none; position: absolute; top: 20px; right: 0; width: 180px; z-index: 5; background-color: white; border-radius: 2px; border: 1px solid #dedede; -moz-box-shadow: 1px 1px 2px #e0dede; -webkit-box-shadow: 1px 1px 2px #e0dede; box-shadow: 1px 1px 2px #e0dede; padding: 5px;} '
+    		+ '#editViewBox {color: black; display: none; position: absolute; top: 20px; right: 0; width: 180px; z-index: 5; background-color: white; border-radius: 2px; border: 1px solid #dedede; -moz-box-shadow: 1px 1px 2px #e0dede; -webkit-box-shadow: 1px 1px 2px #e0dede; box-shadow: 1px 1px 2px #e0dede; padding: 5px;} '
 			+ '#editViewBox .epIcon {margin-top: 5px;} '
+    		+ '.editViewHeadline {margin: 10px 0 3px; padding-bottom: 3px; border-bottom: 1px solid #929292; text-align: center;} '
+    		+ '.editViewHeadline:first-child {margin: 0 0 3px;} '
+    		+ '.editViewLabel {margin: 4px 3px;} '
    			+ '.clearFloat {float: none;}';
 
     head.append('<style type="text/css">' + css + '</style>');
@@ -1000,6 +1017,8 @@ function runScript() {
     				+ '<div class="testMenuHeadlineBox"><div class="testMenuHeadline">'
     					+ '<div id="editView" class="epIcon editButton epRight"></div><div class="clearFloat"></div>'
     					+ '<div id="editViewBox">'
+    						+ '<div class="editViewHeadline">Add view</div>'
+    						+ '<div class="editViewLabel">Time panes:</div>'
     						+ '<div class="styledSelect">'
                                 + '<div class="selectBox"><span class="selectBoxArrow arrowDown"></span><span class="selectBoxText">Vertical</span></div>'
                                 + '<div id="availableViewPanes" class="selectOptionBox">'
@@ -1007,11 +1026,14 @@ function runScript() {
     								+ '<div class="selectOption selected">Horizontal</div>'
     							+ '</div>'
                             + '</div>'
+    						+ '<div class="editViewLabel">View:</div>'
     						+ '<div id="editViewAdd" class="epIcon addButton epRight"></div>'
                             + '<div class="styledSelect">'
                                 + '<div class="selectBox"><span class="selectBoxArrow arrowDown"></span><span class="selectBoxText">Default</span><div class="clearFloat"></div></div>'
                                 + '<div id="availableViewOptions" class="selectOptionBox"></div>'
                             + '</div>'
+    						+ '<div class="editViewHeadline">Delete view</div>'
+    						+ '<div class="editViewLabel">View:</div>'
     						+ '<div id="editViewDelete" class="epIcon deleteButton epRight"></div>'
     						+ '<div class="styledSelect">'
                                 + '<div class="selectBox"><span class="selectBoxArrow arrowDown"></span><span class="selectBoxText"></span><div class="clearFloat"></div></div>'
