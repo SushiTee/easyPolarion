@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       easyPolarion
 // @namespace  https://polarion.server
-// @version    0.1.15
+// @version    0.1.16
 // @description  Script to make the life with Polarion easier
 // @include    /^https?://polarion\.server.*/polarion/.*$/
 // @grant      none
@@ -694,6 +694,12 @@ $(document).ready(function() {
             
             var avTime = (diff/(testTimeArray.length-1))/1000;
             $('#testAvTime').html('Av. time: ' + avTime.toFixed(2) + 's');
+        }
+    });
+
+    $(document).on('mouseover mouseenter mouseleave', '.polarion-PortalBaseSplitter', function() {
+        if($('#ExtraTestMenu').css('display') != 'none') {
+        	$('.polarion-PortalBaseSplitter').css('background-color', 'rgb(70, 72, 82)');
         }
     });
 
