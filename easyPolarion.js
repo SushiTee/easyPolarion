@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       easyPolarion
 // @namespace  https://polarion.server
-// @version    0.1.17
+// @version    0.1.18
 // @description  Script to make the life with Polarion easier
 // @include    /^https?://polarion\.server.*/polarion/.*$/
 // @grant      none
@@ -14,11 +14,13 @@
 
 var expanded = 0;
 var autoClickActive = false;
+var autoTestrunActive = true;
 var LastID = '';
 var LastTestID = '';
 var LastWorkItemID = '';
 var testTimeArray = [];
 var searchLineText = '';
+var searchLineTextRunCount = 0;
 var testCounter = {passed: 0, failed: 0, notRelevant: 0, notTested: 0};
 var messageActive = false;
 var viewObjects = [];
@@ -455,6 +457,28 @@ function drawViews() {
     }
 }
 
+function selectTestrun(callback) {
+    $('.polarion-ExecuteTest-combo').find('div.label').click();
+    
+    var runCount = 0;
+    waitForTestrunSelection();
+    
+    function waitForTestrunSelection() {
+        var menuElement = $('.gwt-PopupPanel');
+        if(!menuElement || menuElement.length <= 0) {
+            if(runCount >= 10) {
+                return;
+            }
+            
+            runCount++;
+            window.setTimeout(waitForTestrunSelection,20);
+        }
+        
+        $(menuElement).find('td.gwt-MenuItem:contains("' + searchLineText + '")').click();
+        callback();
+    }
+}
+
 function expand() {
     if(expanded == 0) {
         addGlobalStyle('.JSTreeTableRow .fixed .content { white-space: normal !important; height: auto !important; } .JSTreeTableRow .fixed { height: auto !important; }');
@@ -486,8 +510,30 @@ function startAutoClick() {
     autoClickActive = true;
 }
 
+function deactivateAutoTestrun() {
+    var button = $('#AutoTestrun');
+	$(button).attr('data-state', 'off');
+    $(button).find('.gwt-Label').html('AutoTestrun (off)');
+    autoTestrunActive = false;
+}
+
+function activateAutoTestrun() {
+    var button = $('#AutoTestrun');
+    $(button).attr('data-state', 'on');
+    $(button).find('.gwt-Label').html('AutoTestrun (on)');
+    autoTestrunActive = true;
+}
+
 function updateSearchLineText() {
     searchLineText = $('.polarion-BubblePanel-InputField').val();
+
+    if(!searchLineText) {
+        if(searchLineTextRunCount < 10) {
+    		searchLineTextRunCount++;
+            window.setTimeout(updateSearchLineText,20);
+        }
+    }
+
     var index = searchLineText.indexOf('TEST_RECORDS')+15;
     if(index == -1)
         return;
@@ -603,12 +649,20 @@ $(document).ready(function() {
     });
     
     $(document).on("click", "#AutoClick", function() {
-        var button = $('#AutoClick');
-        if($(button).attr('data-state') == 'off') {
+        if($('#AutoClick').attr('data-state') == 'off') {
         	startAutoClick();
         }
         else {
             stopAutoClick();
+        }
+    });
+    
+    $(document).on("click", "#AutoTestrun", function() {
+        if($('#AutoTestrun').attr('data-state') == 'off') {
+        	activateAutoTestrun();
+        }
+        else {
+            deactivateAutoTestrun();
         }
     });
     
@@ -858,9 +912,11 @@ $(document).ready(function() {
 });
 
 function mainLoop() {
-    TestRunCheck();
-    autoClick();
-    addMarkMenu();
+    // make sure the test run check is done in any case
+    TestRunCheck(function() {
+    	autoClick();
+    	addMarkMenu();
+    });
 }
 
 function runScript() {
@@ -990,6 +1046,14 @@ function runScript() {
     							+ '<div class="action">'
     								+ '<div class="icon"><img src="data:image/png;base64,' + autoClickImage + '" class="gwt-Image"></div>'
     								+ '<div class="gwt-Label">AutoClick (off)</div>'
+    							+ '</div>'
+    						+ '</td>'
+    					+ '</tr>'
+    					+ '<tr class="noBlock" id="AutoTestrun" data-state="on">'
+    						+ '<td>'
+    							+ '<div class="action">'
+    								+ '<div class="icon"><img src="data:image/png;base64,' + autoClickImage + '" class="gwt-Image"></div>'
+    								+ '<div class="gwt-Label">AutoTestrun (on)</div>'
     							+ '</div>'
     						+ '</td>'
     					+ '</tr>'
@@ -1154,35 +1218,46 @@ function autoClick() {
     $(button).trigger('click');
 }
 
-function TestRunCheck() {
+function TestRunCheck(callback) {
     var testRunElement = $(".polarion-JSPreviewPanelTitle:contains('Execute Test')");
     if(!testRunElement.length) {
+        callback();
         return;
     }
 
     var ID = $(".polarion-JSPreviewPanelTitle:contains('Execute Test')").attr('id');
     
     if(LastTestID == ID) {
+        callback();
         return;
     }
     
 	var comboText = $('.polarion-ExecuteTest-combo').text();
     var index = comboText.indexOf('(')-1;
     if(index == -1 || !comboText.length || !searchLineText.length) {
+        callback();
         return;
     }
+
+    LastTestID = ID;
 
     comboText = comboText.substring(0, index);
     
     if(comboText != searchLineText) {
-        showTestrunMessage();
-        var button = $('#AutoClick');
-        if($(button).attr('data-state') == 'on') {
-            stopAutoClick();
+        if(autoTestrunActive) {
+            selectTestrun(function() {
+                callback();
+            });
+        }
+        else {
+            showTestrunMessage();
+            var button = $('#AutoClick');
+            if($(button).attr('data-state') == 'on') {
+                stopAutoClick();
+            }
+            callback();
         }
     }
-    
-    LastTestID = ID;
 }
 
 function showTestrunMessage() {
