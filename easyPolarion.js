@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       easyPolarion
 // @namespace  https://polarion.server
-// @version    0.1.16
+// @version    0.1.17
 // @description  Script to make the life with Polarion easier
 // @include    /^https?://polarion\.server.*/polarion/.*$/
 // @grant      none
@@ -1024,7 +1024,7 @@ function runScript() {
     					+ '<div id="editView" class="epIcon editButton epRight"></div><div class="clearFloat"></div>'
     					+ '<div id="editViewBox">'
     						+ '<div class="editViewHeadline">Add view</div>'
-    						+ '<div class="editViewLabel">Time panes:</div>'
+    						+ '<div class="editViewLabel">Tile panes:</div>'
     						+ '<div class="styledSelect">'
                                 + '<div class="selectBox"><span class="selectBoxArrow arrowDown"></span><span class="selectBoxText">Vertical</span></div>'
                                 + '<div id="availableViewPanes" class="selectOptionBox">'
