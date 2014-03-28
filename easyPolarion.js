@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       easyPolarion
 // @namespace  https://polarion.server
-// @version    0.1.18
+// @version    0.1.19
 // @description  Script to make the life with Polarion easier
 // @include    /^https?://polarion\.server.*/polarion/.*$/
 // @grant      none
@@ -457,7 +457,7 @@ function drawViews() {
     }
 }
 
-function selectTestrun(callback) {
+function selectTestrun(callback, failcallback) {
     $('.polarion-ExecuteTest-combo').find('div.label').click();
     
     var runCount = 0;
@@ -467,6 +467,7 @@ function selectTestrun(callback) {
         var menuElement = $('.gwt-PopupPanel');
         if(!menuElement || menuElement.length <= 0) {
             if(runCount >= 10) {
+                failcallback();
                 return;
             }
             
@@ -474,7 +475,13 @@ function selectTestrun(callback) {
             window.setTimeout(waitForTestrunSelection,20);
         }
         
-        $(menuElement).find('td.gwt-MenuItem:contains("' + searchLineText + '")').click();
+        var menuItem = $(menuElement).find('td.gwt-MenuItem:contains("' + searchLineText + '")');
+        if(!menuItem.length) {
+        	failcallback();
+            return;
+        }
+        
+        $(menuItem).click();
         callback();
     }
 }
@@ -1247,15 +1254,22 @@ function TestRunCheck(callback) {
         if(autoTestrunActive) {
             selectTestrun(function() {
                 callback();
+            }, function() {
+            	finalize();
+                callback();
             });
         }
         else {
-            showTestrunMessage();
-            var button = $('#AutoClick');
-            if($(button).attr('data-state') == 'on') {
-                stopAutoClick();
-            }
+            finalize();
             callback();
+        }
+    }
+    
+    function finalize() {
+    	showTestrunMessage();
+        var button = $('#AutoClick');
+        if($(button).attr('data-state') == 'on') {
+            stopAutoClick();
         }
     }
 }
