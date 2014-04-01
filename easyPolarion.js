@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       easyPolarion
 // @namespace  https://polarion.server
-// @version    0.1.19
+// @version    0.1.20
 // @description  Script to make the life with Polarion easier
 // @include    /^https?://polarion\.server.*/polarion/.*$/
 // @grant      none
@@ -1003,7 +1003,7 @@ function runScript() {
     }
     tbody.children('tr').append('<td><div id="ExtraTestMenuButtonShow"></div></td>');
     
-    var testMenuItemDisplays = {Description: {display: '', arrow: 'down'}, AutoClick: {display: '', arrow: 'down'}, View: {display: ' style="display: none;"', arrow: 'right'}, Statistics: {display: ' style="display: none;"', arrow: 'right'}};
+    var testMenuItemDisplays = {Description: {display: '', arrow: 'down'}, AutoClick: {display: '', arrow: 'down'}, AutoTestrun: {display: ' style="display: none;"', arrow: 'right'}, View: {display: ' style="display: none;"', arrow: 'right'}, Statistics: {display: ' style="display: none;"', arrow: 'right'}};
     var testMenuItemDisplaykeys = Object.keys(testMenuItemDisplays); 
     for(var i = 0; i < testMenuItemDisplaykeys.length; i++) {
         var key = testMenuItemDisplaykeys[i];
@@ -1056,14 +1056,6 @@ function runScript() {
     							+ '</div>'
     						+ '</td>'
     					+ '</tr>'
-    					+ '<tr class="noBlock" id="AutoTestrun" data-state="on">'
-    						+ '<td>'
-    							+ '<div class="action">'
-    								+ '<div class="icon"><img src="data:image/png;base64,' + autoClickImage + '" class="gwt-Image"></div>'
-    								+ '<div class="gwt-Label">AutoTestrun (on)</div>'
-    							+ '</div>'
-    						+ '</td>'
-    					+ '</tr>'
                     + '</table>'
     				+ '<table style="width: 100%; padding: 4px;">'
                         + '<!--<tr><td><input id="AutoClickButton" type="text" placeholder="Buttontext"/></td></tr>-->'
@@ -1089,6 +1081,19 @@ function runScript() {
                                 + '<input type="radio" name="testSetting" value="stop">Stop at headline'
                             + '</form>'
                         + '</td></tr>'
+    				+ '</table>'
+    				+ '</div>'
+    				+ '<div class="testMenuHeadlineBox"><div class="testMenuHeadline"><div class="arrow ' + testMenuItemDisplays.AutoTestrun.arrow + '"></div><div class="testMenuHeadlineText">AutoTestrun</div></div></div>'
+    				+ '<div class="testMenuItem"' + testMenuItemDisplays.AutoTestrun.display + '>'
+    				+ '<table style="width: 100%; border-spacing: 0;">'
+    					+ '<tr class="noBlock" id="AutoTestrun" data-state="on">'
+    						+ '<td>'
+    							+ '<div class="action">'
+    								+ '<div class="icon"><img src="/polarion/ria/images/details/testrunIcon.png" class="gwt-Image" style="margin: 0 5.5px;"></div>'
+    								+ '<div class="gwt-Label">AutoTestrun (on)</div>'
+    							+ '</div>'
+    						+ '</td>'
+    					+ '</tr>'
     				+ '</table>'
     				+ '</div>'
     				+ '<div class="testMenuHeadlineBox"><div class="testMenuHeadline">'
@@ -1118,7 +1123,8 @@ function runScript() {
     							+ '</div>'
                             + '</div>'
     					+ '</div>'
-    					+ '<div class="arrow ' + testMenuItemDisplays.View.arrow + '"></div><div class="testMenuHeadlineText">View</div><div class="clearFloat"></div></div></div>'
+    					+ '<div class="arrow ' + testMenuItemDisplays.View.arrow + '"></div><div class="testMenuHeadlineText">View</div><div class="clearFloat"></div>'
+    				+ '</div></div>'
     				+ '<div class="testMenuItem"' + testMenuItemDisplays.View.display + '>'
     				+ '<table id="viewTable" style="width: 100%; border-spacing: 0;">'
     				+ '</table>'
