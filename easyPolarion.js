@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       easyPolarion
 // @namespace  https://polarion.server
-// @version    0.1.20
+// @version    0.1.21
 // @description  Script to make the life with Polarion easier
 // @include    /^https?://polarion\.server.*/polarion/.*$/
 // @grant      none
@@ -467,7 +467,9 @@ function selectTestrun(callback, failcallback) {
         var menuElement = $('.gwt-PopupPanel');
         if(!menuElement || menuElement.length <= 0) {
             if(runCount >= 10) {
-                failcallback();
+                if(failcallback) {
+                    failcallback();
+                }
                 return;
             }
             
@@ -477,12 +479,16 @@ function selectTestrun(callback, failcallback) {
         
         var menuItem = $(menuElement).find('td.gwt-MenuItem:contains("' + searchLineText + '")');
         if(!menuItem.length) {
-        	failcallback();
+            if(failcallback) {
+        		failcallback();
+            }
             return;
         }
         
         $(menuItem).click();
-        callback();
+        if(callback) {
+        	callback();
+        }
     }
 }
 
@@ -689,13 +695,13 @@ $(document).ready(function() {
             $(this).attr('class', 'arrow down');
             
             // store information in a cookie
-            createCookie('extraMenu_' + $(headLineBox).find('.testMenuHeadlineText').text(), '1', 2); // 1 = open
+            createCookie('extraMenu_' + $(headLineBox).find('.testMenuHeadlineText').text(), '1', 3); // 1 = open
         }
         else {
             $(this).attr('class', 'arrow right');
 
             // store information in a cookie
-            createCookie('extraMenu_' + $(headLineBox).find('.testMenuHeadlineText').text(), '0', 2); // 0 = closed
+            createCookie('extraMenu_' + $(headLineBox).find('.testMenuHeadlineText').text(), '0', 3); // 0 = closed
         }
         
         $(headLineBox).next('.testMenuItem').slideToggle(150);
@@ -916,6 +922,14 @@ $(document).ready(function() {
         
         $('#editViewBox').toggle();
     });
+    
+    $(window).on('focus', function() {
+        if(autoTestrunActive && $('.polarion-ExecuteTest-combo').length) {
+            selectTestrun(function() {}, function() {
+                showTestrunMessage('Failed to set correct test run. Test runs may differ.');
+            });
+        }
+    });
 });
 
 function mainLoop() {
@@ -1010,10 +1024,16 @@ function runScript() {
         if(readCookie('extraMenu_' + key) == '0') {
             testMenuItemDisplays[key].display = ' style="display: none;"';
             testMenuItemDisplays[key].arrow = 'right';
+            
+            // refresh cookie
+            createCookie('extraMenu_' + key, '0', 3); // 1 = open
         }
         else if(readCookie('extraMenu_' + key) == '1') {
             testMenuItemDisplays[key].display = '';
             testMenuItemDisplays[key].arrow = 'down';
+            
+            // refresh cookie
+            createCookie('extraMenu_' + key, '1', 3); // 1 = open
         }
     }
     
@@ -1272,7 +1292,7 @@ function TestRunCheck(callback) {
     }
     
     function finalize() {
-    	showTestrunMessage();
+    	showTestrunMessage('Test runs differ.');
         var button = $('#AutoClick');
         if($(button).attr('data-state') == 'on') {
             stopAutoClick();
@@ -1280,7 +1300,7 @@ function TestRunCheck(callback) {
     }
 }
 
-function showTestrunMessage() {
+function showTestrunMessage(text) {
     messageActive = true;
 
     var width = $(window).width();
@@ -1311,7 +1331,7 @@ function showTestrunMessage() {
                                                             + '<table cellspacing="0" cellpadding="0" class="polarion-EasyDialog-top">'
                                                                 + '<tr>'
                                                                     + '<td align="left" style="vertical-align: top;">'
-                                                                        + '<div class="polarion-EasyDialog-title">Test runs differ.</div>'
+                                                                        + '<div class="polarion-EasyDialog-title">' + text + '</div>'
                                                                     + '</td>'
                                                                 + '</tr>'
                                                             + '</table>'
