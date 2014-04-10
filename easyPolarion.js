@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       easyPolarion
 // @namespace  https://polarion.server
-// @version    0.1.21
+// @version    0.1.22
 // @description  Script to make the life with Polarion easier
 // @include    /^https?://polarion\.server.*/polarion/.*$/
 // @grant      none
@@ -494,7 +494,7 @@ function selectTestrun(callback, failcallback) {
 
 function expand() {
     if(expanded == 0) {
-        addGlobalStyle('.JSTreeTableRow .fixed .content { white-space: normal !important; height: auto !important; } .JSTreeTableRow .fixed { height: auto !important; }');
+        addGlobalStyle('.JSTreeTableRow .content { white-space: normal !important; height: auto !important; } .JSTreeTableRow .fixed { height: auto !important; }');
         $('#ExpandDescription').find('.gwt-Label').html('Description (on)');
         expanded = 1;
     }
@@ -709,9 +709,9 @@ $(document).ready(function() {
     
     $(document).on('click', '.polarion-ExecuteTest-buttons', function() {
 		var buttonText = $(this).text(),
-            selectedItem = $('.JSTreeTableRow.selected.fixed');
+            selectedItem = $('.JSTreeTableRow.selected');
         if(selectedItem.length <= 0) {
-            selectedItem = $('.JSTreeTableRow.over.fixed');
+            selectedItem = $('.JSTreeTableRow.over');
         }
 
         if(buttonText == 'Passed') {
@@ -813,7 +813,7 @@ $(document).ready(function() {
         $('#ItemMarkPopup').css('display', 'none');
         $('#ItemMarkMenu').attr('data-menu', 'off');
         
-        var selectedItem = $('.JSTreeTableRow.selected.fixed');
+        var selectedItem = $('.JSTreeTableRow.selected');
         if(selectedItem.length <= 0) {
             return;
         }
@@ -1191,9 +1191,9 @@ function autoClick() {
 
     // detect headlines
     var isHeadline = false;
-    var selectedItem = $('.JSTreeTableRow.selected.fixed');
+    var selectedItem = $('.JSTreeTableRow.selected');
     if(selectedItem.length <= 0) {
-        selectedItem = $('.JSTreeTableRow.over.fixed');
+        selectedItem = $('.JSTreeTableRow.over');
     }
     if($(selectedItem).find('img[src^="/polarion/icons/default/enums/type_heading.png"]').length) {
         isHeadline = true;
