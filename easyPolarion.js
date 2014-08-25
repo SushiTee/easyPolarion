@@ -612,7 +612,8 @@ function addMarkMenu() {
 	// update search text    
     updateSearchLineText();
 	
-    searchField = $(searchField).closest('.GGAJDYPHKB-com-polarion-portal-js-viewers-querypanel-AbstractQueryPanel-CSS-CellFree').parent().closest('td');
+    //searchField = $(searchField).closest('.GGAJDYPHKB-com-polarion-portal-js-viewers-querypanel-AbstractQueryPanel-CSS-CellFree').parent().closest('td');
+    searchField = $(searchField).closest('.GKH2-DJCCKB').parent().closest('td');
     if(!searchField.length) {
         return;
     }
@@ -627,13 +628,13 @@ function addMarkMenu() {
                                                     + '<tr><td><div class="ItemMarkEl" data-state="notTested"></div></td></tr>'
                                                 + '</table>'
                                             + '</div></div>'
-                                            + '<table id="ItemMarkMenuButton" cellspacing="0" cellpadding="0" class="GGAJDYPB1B-com-polarion-reina-web-js-widgets-toolbar-ToolbarPopupButton-CSS2-Button">'
+                                            + '<table id="ItemMarkMenuButton" cellspacing="0" cellpadding="0" class="GKH2-DJCN0B">'
                                                 + '<tr>'
-                                                    + '<td class="GGAJDYPASB-com-polarion-reina-web-js-widgets-JSPopupButton-CSS-IconCellStyle GGAJDYPBSB-com-polarion-reina-web-js-widgets-JSPopupButton-CSS-IconCellStyleWithoutText" valign="middle" title="Show Sidebar">'
-                                                        + '<img class="GGAJDYPP-B-com-polarion-reina-web-js-widgets-toolbar-ToolbarButton-CSS2-Icon" src="data:image/png;base64,' + menuImage + '">'
+                                                    + '<td class="GKH2-DJCMRB GKH2-DJCNRB" valign="middle" title="Show Sidebar">'
+                                                        + '<img class="GKH2-DJCL-B" src="data:image/png;base64,' + menuImage + '">'
                                                     + '</td>'
-                                                    + '<td class="GGAJDYPG1B-com-polarion-reina-web-js-widgets-toolbar-ToolbarPopupButton-CSS2-IconTD" valign="middle">'
-                                                       + '<img class="GGAJDYPP0B-com-polarion-reina-web-js-widgets-toolbar-ToolbarPopupButton-CSS2-Arrow" src="/polarion/ria/images/button_arrow.gif">'
+                                                    + '<td class="GKH2-DJCC1B" valign="middle">'
+                                                       + '<img class="GKH2-DJCL0B" src="/polarion/ria/images/button_arrow.gif">'
                                                     + '</td>'
                                                 + '</tr>'
                                             + '</table>'
